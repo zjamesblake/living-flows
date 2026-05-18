@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Bounty — Payout System Overview</title>
+<style>
+  :root {
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-tertiary: #888;
+    --bg-primary: #fff;
+    --bg-secondary: #fafafa;
+    --bg-tertiary: #f3f3f3;
+    --border: #e0e0e0;
+    --border-light: #eee;
+    --purple: #6C5CE7;
+    --purple-bg: #F0EFFE;
+    --teal: #00B894;
+    --teal-bg: #E8FAF5;
+    --amber: #E17055;
+    --amber-bg: #FEF0EC;
+    --blue: #0984E3;
+    --blue-bg: #E8F4FD;
+    --gray: #636E72;
+    --gray-bg: #F0F0F0;
+    --green: #00B894;
+    --green-bg: #E8FAF5;
+    --red-bg: #FFF0F0;
+    --red-text: #C0392B;
+    --yellow-bg: #FFF9E6;
+    --yellow-text: #8B6914;
+    --radius: 10px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-primary: rgba(255,255,255,0.9);
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-tertiary: rgba(255,255,255,0.4);
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #222;
+      --bg-tertiary: #2a2a2a;
+      --border: #3a3a3a;
+      --border-light: #333;
+      --purple-bg: #1E1A3A;
+      --teal-bg: #0A2A22;
+      --amber-bg: #2A1510;
+      --blue-bg: #0A1E2E;
+      --gray-bg: #2a2a2a;
+      --green-bg: #0A2A22;
+      --red-bg: #2A1010;
+      --red-text: #E74C3C;
+      --yellow-bg: #2A2510;
+      --yellow-text: #F1C40F;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+  .page { max-width: 780px; margin: 0 auto; padding: 32px 20px 60px; }
+  .header { margin-bottom: 40px; }
+  .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .header p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+  .header .meta { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .header .meta span { font-size: 12px; color: var(--text-tertiary); background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; padding: 12px 16px; background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: var(--radius); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .section-divider { margin: 48px 0 36px; padding: 16px 0; border-top: 2px solid var(--border); }
+  .section-divider h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .section-divider p { font-size: 13px; color: var(--text-secondary); }
+  .phase { margin-bottom: 36px; }
+  .phase-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; color: var(--text-tertiary); margin-bottom: 12px; padding-left: 4px; }
+  .step { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; background: var(--bg-secondary); overflow: hidden; }
+  .step-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
+  .step-header:hover { background: var(--bg-tertiary); }
+  .step-num { min-width: 28px; height: 28px; border-radius: 50%; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-info { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .step-subtitle { font-size: 12px; color: var(--text-secondary); }
+  .step-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .badge { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; padding: 2px 8px; border-radius: 4px; }
+  .badge-owner { background: var(--bg-tertiary); color: var(--text-secondary); }
+  .badge-system { background: var(--blue-bg); color: var(--blue); }
+  .badge-auto { background: var(--green-bg); color: var(--teal); }
+  .badge-manual { background: var(--yellow-bg); color: var(--yellow-text); }
+  .badge-new { background: var(--purple-bg); color: var(--purple); }
+  .expand-icon { font-size: 16px; color: var(--text-tertiary); margin-top: 4px; transition: transform 0.2s; flex-shrink: 0; }
+  .step.open .expand-icon { transform: rotate(180deg); }
+  .step-details { display: none; border-top: 1px solid var(--border-light); padding: 14px 16px 14px 56px; }
+  .step.open .step-details { display: block; }
+  .detail-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+  .detail-label { min-width: 70px; font-weight: 500; color: var(--text-tertiary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; flex-shrink: 0; }
+  .detail-value { color: var(--text-primary); }
+  .note { font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-top: 8px; line-height: 1.5; }
+  .note-resolved { background: var(--green-bg); color: var(--teal); }
+  .note-decision { background: var(--yellow-bg); color: var(--yellow-text); }
+  .note-info { background: var(--blue-bg); color: var(--blue); }
+  .note-new { background: var(--purple-bg); color: var(--purple); }
+  .arrow { text-align: center; color: var(--text-tertiary); font-size: 16px; margin: 2px 0; line-height: 1; }
+  .gate-section { margin-top: 32px; margin-bottom: 32px; }
+  .gate-section h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .gate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gate { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; background: var(--bg-secondary); }
+  .gate-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .gate-desc { font-size: 12px; color: var(--text-secondary); }
+  @media (max-width: 600px) { .gate-grid { grid-template-columns: 1fr; } }
+  .schema-section { margin-top: 32px; margin-bottom: 32px; }
+  .schema-section h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .schema-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .schema-table th { text-align: left; padding: 8px 10px; background: var(--bg-tertiary); border: 1px solid var(--border); font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; }
+  .schema-table td { padding: 8px 10px; border: 1px solid var(--border); color: var(--text-primary); }
+  .schema-table tr:nth-child(even) td { background: var(--bg-secondary); }
+  .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+  .role { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; background: var(--bg-secondary); }
+  .role-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .role-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+  @media (max-width: 600px) { .role-grid { grid-template-columns: 1fr; } }
+  .n-gray .step-num { background: var(--gray-bg); color: var(--gray); }
+  .n-purple .step-num { background: var(--purple-bg); color: var(--purple); }
+  .n-teal .step-num { background: var(--teal-bg); color: var(--teal); }
+  .n-amber .step-num { background: var(--amber-bg); color: var(--amber); }
+  .n-blue .step-num { background: var(--blue-bg); color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <h1>Ad Bounty &mdash; Payout System Overview</h1>
+  <p>How monthly payouts work: from ad spend data through student payments and brand invoicing. Shows the current production system and proposed financial controls.</p>
+  <div class="meta">
+    <span>May 2026</span>
+    <span>8 skills &middot; 5 brands &middot; 105 students</span>
+    <span>Current + Proposed</span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Script (automated)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Zak (runs skill, verifies)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Team (Ghed / Angie / Karlo)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Proposed (May)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gray)"></div> System (ClickUp / Discord / Whop / Wise)</div>
+</div>
+
+<!-- ROLES -->
+<div class="role-grid">
+  <div class="role"><div class="role-name">Zak</div><div class="role-desc">Runs skills, reviews outputs, approves payouts and adjustments</div></div>
+  <div class="role"><div class="role-name">Ghed</div><div class="role-desc">Creates Atria snapshots, sends Wise payments, applies Whop promo codes, confirms brand payments received</div></div>
+  <div class="role"><div class="role-name">Angie</div><div class="role-desc">Invoices brands based on spend totals</div></div>
+  <div class="role"><div class="role-name">Lovro</div><div class="role-desc">Fields student support tickets, verifies adjustment claims</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 1: CURRENT SYSTEM -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section-divider">
+  <h2>Current System (Production)</h2>
+  <p>Built April 2026. Sequential human-verified skills. Every step produces output you review before proceeding.</p>
+</div>
+
+<!-- PHASE 1 -->
+<div class="phase">
+<div class="phase-label">Phase 1 &mdash; Data Collection</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div class="step-info">
+      <div class="step-title">Pull spend data from CSV exports</div>
+      <div class="step-subtitle">Parse Meta ad account or Atria CSVs &rarr; match ads to students &rarr; store per-ad spend</div>
+      <div class="step-badges"><span class="badge badge-owner">Zak runs skill</span><span class="badge badge-auto">pull_spend.py</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Input</div><div class="detail-value">One CSV per brand (Meta ad account export or Atria report), filtered to bounty ads</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Parse each CSV &rarr; match ads to students via CREATOR-ID (primary) or name (fallback) &rarr; check exclude_patterns.json for internal ads &rarr; check manual_matches.json for legacy students &rarr; convert AUD to USD for Dog Friendly Co. &rarr; store in per_period_ad_creative_spend</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Zak (provides CSVs, reviews output)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Spend report: per-brand totals, match stats, unmatched ads list. Brand invoice summary for Angie.</div></div>
+    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">draft &rarr; pulled</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase">
+<div class="phase-label">Phase 2 &mdash; Verification</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div class="step-info">
+      <div class="step-title">Verify matches + reconcile CSV totals</div>
+      <div class="step-subtitle">HARD GATE: CSV total &minus; excluded = DB total per brand. Every dollar accounted for.</div>
+      <div class="step-badges"><span class="badge badge-auto">verify_matches.py</span><span class="badge badge-system">Gate: do not pass</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Gate 1</div><div class="detail-value">Per-brand: CSV total &minus; excluded internals = DB total. Must match to the penny.</div></div>
+    <div class="detail-row"><div class="detail-label">Gate 2</div><div class="detail-value">Every spend row has a valid student_id or is a tracked legacy match.</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Match report + brand invoice summary (for Angie to invoice immediately)</div></div>
+    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">pulled &rarr; matched &rarr; reconciled</div></div>
+    <div class="note note-resolved">This gate would have caught the March failure instantly &mdash; the numbers simply wouldn't have matched.</div>
+  </div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">&bull;</div>
+    <div class="step-info">
+      <div class="step-title">Angie invoices brands</div>
+      <div class="step-subtitle">Brand spend totals are ready as soon as Skill 2 passes &mdash; no need to wait for student payouts</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Angie</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Input</div><div class="detail-value">Brand invoice summary from Skill 2 (spend per brand in USD)</div></div>
+    <div class="detail-row"><div class="detail-label">Rates</div><div class="detail-value">Old brands (DFC, FunPunch, Rodent Free): 3.5% of spend. New brands (Zend, Boostiva): 10% of spend.</div></div>
+    <div class="detail-row"><div class="detail-label">Terms</div><div class="detail-value">Net 7</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase">
+<div class="phase-label">Phase 3 &mdash; Calculation</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">4</div>
+    <div class="step-info">
+      <div class="step-title">Calculate payouts</div>
+      <div class="step-subtitle">3.5% flat rate &times; spend per student per brand. Reconciliation checks R4&ndash;R7.</div>
+      <div class="step-badges"><span class="badge badge-auto">calculate_payouts.py</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Aggregate per_period_ad_creative_spend &rarr; student_brand_payouts (per brand) &rarr; student_period_payouts (total per student). Flag &lt;$20 as promo.</div></div>
+    <div class="detail-row"><div class="detail-label">Checks</div><div class="detail-value">R4: brand total = sum of students. R5: global total = sum of all. R6: total payout = sum of payouts. R7: per-brand payout = sum of brand's students.</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Full payout report with per-student breakdown. P&amp;L summary for #bounty-internal.</div></div>
+    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">reconciled &rarr; calculated</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 4 -->
+<div class="phase">
+<div class="phase-label">Phase 4 &mdash; Approval + Atria Links</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">5</div>
+    <div class="step-info">
+      <div class="step-title">Approve + create ClickUp tasks</div>
+      <div class="step-subtitle">One ClickUp task per student (&ge;$20) with payment details. Promo tasks for &lt;$20 students.</div>
+      <div class="step-badges"><span class="badge badge-owner">Zak approves</span><span class="badge badge-auto">create_payment_tasks.py</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">45 payment tasks (Wise details included) + 31 [PROMO] tasks (Whop codes generated)</div></div>
+    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">calculated &rarr; approved</div></div>
+  </div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">&bull;</div>
+    <div class="step-info">
+      <div class="step-title">Ghed creates Atria snapshots</div>
+      <div class="step-subtitle">One Atria snapshot per brand per student &rarr; links added to ClickUp tasks</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Ghed</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">SOP</div><div class="detail-value">Filter Atria by brand + student name, create snapshot, paste link into ClickUp task description</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 5 -->
+<div class="phase">
+<div class="phase-label">Phase 5 &mdash; Notification</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">6</div>
+    <div class="step-info">
+      <div class="step-title">Send payout DMs + promo codes</div>
+      <div class="step-subtitle">Discord DMs with payout breakdown + Atria links. Whop promo codes for &lt;$20 students.</div>
+      <div class="step-badges"><span class="badge badge-auto">send_notifications.py</span><span class="badge badge-system">Discord + Whop</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Payout DM</div><div class="detail-value">Green embed: total, per-brand breakdown with Atria links, payment method + timeline</div></div>
+    <div class="detail-row"><div class="detail-label">Promo DM</div><div class="detail-value">Blue embed: earned amount, "discount applied to next billing cycle"</div></div>
+    <div class="detail-row"><div class="detail-label">Tracking</div><div class="detail-value">Per-student: sent/failed, Discord message ID, error reason. Failed DMs generate manual outreach list.</div></div>
+  </div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">7</div>
+    <div class="step-info">
+      <div class="step-title">Community announcements</div>
+      <div class="step-subtitle">Per-brand channel posts + main announcement + #bounty-internal P&amp;L summary</div>
+      <div class="step-badges"><span class="badge badge-owner">Zak reviews + posts</span><span class="badge badge-auto">generate_announcements.py</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Brand posts</div><div class="detail-value">Top 3 earners (by Discord mention), spend stats, report link</div></div>
+    <div class="detail-row"><div class="detail-label">Main post</div><div class="detail-value">Total payouts, number of students, FOMO facts</div></div>
+    <div class="detail-row"><div class="detail-label">Internal</div><div class="detail-value">P&amp;L: invoiced vs payouts vs management fee revenue, by brand</div></div>
+    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">approved &rarr; notified</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 6 -->
+<div class="phase">
+<div class="phase-label">Phase 6 &mdash; Payment + Close</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">&bull;</div>
+    <div class="step-info">
+      <div class="step-title">Ghed processes payments</div>
+      <div class="step-subtitle">Sends Wise payments from ClickUp tasks, applies Whop promo codes via dashboard</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Ghed</span><span class="badge badge-system">Wise + Whop</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Payments</div><div class="detail-value">Open each ClickUp task, send Wise payment using details in description, paste reference # into custom field, move to "Paid"</div></div>
+    <div class="detail-row"><div class="detail-label">Promos</div><div class="detail-value">Open each [PROMO] task, copy the code, apply via Whop dashboard &rarr; Members &rarr; right-click subscription &rarr; apply code</div></div>
+  </div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">8</div>
+    <div class="step-info">
+      <div class="step-title">Finalize period</div>
+      <div class="step-subtitle">Verify all payments, lock period, update lifetime earnings</div>
+      <div class="step-badges"><span class="badge badge-auto">finalize_period.py</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Read ClickUp task statuses + payment references. Verify all students are "paid" or "promo_issued." Lock period.</div></div>
+    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">notified &rarr; complete</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 2: PROPOSED ADDITIONS -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="section-divider">
+  <h2>Proposed: Financial Controls (May 2026)</h2>
+  <p>Four additions to close the verification gaps. We can calculate every dollar owed &mdash; now we verify every dollar moved.</p>
+</div>
+
+<!-- PROPOSED 1 -->
+<div class="phase">
+<div class="phase-label">Addition 1 &mdash; Payment Verification (AP)</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">&#9733;</div>
+    <div class="step-info">
+      <div class="step-title">Wise API payment verification</div>
+      <div class="step-subtitle">Auto-verify: amount sent = amount calculated, transfer completed, recipient correct</div>
+      <div class="step-badges"><span class="badge badge-new">NEW</span><span class="badge badge-auto">Added to finalize_period.py</span><span class="badge badge-system">Wise API</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Skill 8 (Finalize) &mdash; runs after Ghed marks all ClickUp tasks as "Paid"</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">For each payment reference: query Wise API &rarr; get transfer amount, status, recipient &rarr; compare against calculated payout &rarr; flag mismatches</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Payment verification report: every payment confirmed (green) or flagged (amount mismatch, failed transfer, pending)</div></div>
+    <div class="detail-row"><div class="detail-label">Gate</div><div class="detail-value">Period cannot close until all payments are verified or flagged with acknowledged reason</div></div>
+    <div class="note note-new">Catches: wrong amounts sent, failed transfers, pending transfers, recipient mismatches. Currently undetectable.</div>
+  </div>
+</div>
+</div>
+
+<!-- PROPOSED 2 -->
+<div class="phase">
+<div class="phase-label">Addition 2 &mdash; Invoice Tracking (AR)</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">&#9733;</div>
+    <div class="step-info">
+      <div class="step-title">Brand invoice lifecycle tracking</div>
+      <div class="step-subtitle">Track: invoice sent &rarr; brand paid &rarr; amount verified. Auto-flag overdue (net-7 + 3 day grace).</div>
+      <div class="step-badges"><span class="badge badge-new">NEW</span><span class="badge badge-owner">Angie + Ghed</span><span class="badge badge-system">Supabase + ClickUp</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Table</div><div class="detail-value">brand_invoices: brand_id, period_id, invoice_amount, status (draft &rarr; sent &rarr; paid &rarr; verified / overdue)</div></div>
+    <div class="detail-row"><div class="detail-label">Flow</div><div class="detail-value">Skill 2 creates invoice rows &rarr; Angie marks "sent" &rarr; Ghed confirms "paid" with reference &rarr; Skill 8 verifies amount matches</div></div>
+    <div class="detail-row"><div class="detail-label">Alert</div><div class="detail-value">Day 10: auto-flag overdue invoices to #bounty-internal</div></div>
+    <div class="detail-row"><div class="detail-label">Gate</div><div class="detail-value">Period cannot close until all brand invoices are paid and verified</div></div>
+    <div class="note note-new">Currently: Angie invoices, no tracking of whether brands actually pay. With net-7 terms and 5+ brands, a missed payment could go unnoticed for weeks.</div>
+  </div>
+</div>
+</div>
+
+<!-- PROPOSED 3 -->
+<div class="phase">
+<div class="phase-label">Addition 3 &mdash; Adjustment Audit Trail</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">&#9733;</div>
+    <div class="step-info">
+      <div class="step-title">Tracked, approved payment adjustments</div>
+      <div class="step-subtitle">Every change logged: original amount, adjusted amount, reason, who requested, who approved</div>
+      <div class="step-badges"><span class="badge badge-new">NEW</span><span class="badge badge-owner">Lovro &rarr; Zak</span><span class="badge badge-auto">/payout-adjust</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Table</div><div class="detail-value">payout_adjustments: original_amount, adjusted_amount, reason, support_ticket_ref, requested_by, approved_by, applied_at</div></div>
+    <div class="detail-row"><div class="detail-label">Flow</div><div class="detail-value">Student reports missing ad &rarr; Lovro verifies in ad account &rarr; creates adjustment request &rarr; Zak approves &rarr; /payout-adjust applies + logs + creates ClickUp task for additional payment</div></div>
+    <div class="detail-row"><div class="detail-label">Rule</div><div class="detail-value">Original values are NEVER overwritten &mdash; adjustments are additive records. Full history preserved.</div></div>
+    <div class="note note-new">April had 3 adjustments ($140 total) done by direct DB edits with no trail. This formalizes the process.</div>
+  </div>
+</div>
+</div>
+
+<!-- PROPOSED 4 -->
+<div class="phase">
+<div class="phase-label">Addition 4 &mdash; Brand Billing Configuration</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">&#9733;</div>
+    <div class="step-info">
+      <div class="step-title">Per-brand billing rates in Supabase</div>
+      <div class="step-subtitle">Old brands: 3.5% (payout only). New brands: 10% (3.5% payout + 6.5% management fee). Stored, not hardcoded.</div>
+      <div class="step-badges"><span class="badge badge-new">NEW</span><span class="badge badge-system">Supabase</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Fields</div><div class="detail-value">brands table: billing_model (payout_only / full_service), billing_rate (0.035 / 0.10), management_fee_rate (0.0 / 0.065)</div></div>
+    <div class="detail-row"><div class="detail-label">Drives</div><div class="detail-value">Invoice calculations, P&amp;L summary, and profitability reporting &mdash; all automatically from one source of truth</div></div>
+    <div class="note note-info">Currently hardcoded in the announcement script. Moving to Supabase means no code changes when a brand switches models or a new brand onboards.</div>
+  </div>
+</div>
+</div>
+
+<!-- COMPLETE FLOW -->
+<div class="section-divider">
+  <h2>Complete Flow (with Financial Controls)</h2>
+  <p>How everything connects once the proposed additions are in place.</p>
+</div>
+
+<div class="phase">
+<div class="step n-gray" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">&bull;</div>
+    <div class="step-info">
+      <div class="step-title" style="font-size:13px; line-height:1.6;">
+        <strong>Skills 1&ndash;4:</strong> Pull CSVs &rarr; Verify + create invoices &rarr; Calculate payouts<br>
+        <strong>Skill 5:</strong> Create ClickUp tasks &rarr; Ghed adds Atria links<br>
+        <strong>Skills 6&ndash;7:</strong> Send DMs + promos &rarr; Post announcements + P&amp;L<br>
+        <strong>Ghed:</strong> Sends Wise payments + applies promo codes<br>
+        <strong>Angie:</strong> Sends invoices &rarr; Ghed confirms brand payments<br>
+        <strong style="color:var(--purple)">Support:</strong> Lovro fields tickets &rarr; /payout-adjust (if needed)<br>
+        <strong style="color:var(--purple)">Skill 8:</strong> Verify all payments via Wise API + all invoices paid + all adjustments logged &rarr; <strong>Period locked</strong>
+      </div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Money Out</div><div class="detail-value">Calculated &rarr; approved &rarr; paid (Wise) &rarr; <strong style="color:var(--purple)">verified (Wise API)</strong></div></div>
+    <div class="detail-row"><div class="detail-label">Money In</div><div class="detail-value"><strong style="color:var(--purple)">Invoiced &rarr; sent &rarr; paid &rarr; verified (amount match)</strong></div></div>
+    <div class="detail-row"><div class="detail-label">Adjustments</div><div class="detail-value"><strong style="color:var(--purple)">Requested &rarr; verified &rarr; approved &rarr; applied (with full audit trail)</strong></div></div>
+    <div class="detail-row"><div class="detail-label">Close</div><div class="detail-value">Period locks only when: all payments verified + all invoices paid + all adjustments logged</div></div>
+    <div class="note note-new">Every dollar in and out is tracked, verified, and reconciled before the period closes. No silent failures, no undetectable errors.</div>
+  </div>
+</div>
+</div>
+
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('open');
+}
+document.querySelector('.step').classList.add('open');
+</script>
+</body>
+</html>

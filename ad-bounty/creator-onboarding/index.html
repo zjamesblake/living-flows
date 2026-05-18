@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Bounty — Student Onboarding Flow</title>
+<style>
+  :root {
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-tertiary: #888;
+    --bg-primary: #fff;
+    --bg-secondary: #fafafa;
+    --bg-tertiary: #f3f3f3;
+    --border: #e0e0e0;
+    --border-light: #eee;
+    --purple: #6C5CE7;
+    --purple-bg: #F0EFFE;
+    --teal: #00B894;
+    --teal-bg: #E8FAF5;
+    --amber: #E17055;
+    --amber-bg: #FEF0EC;
+    --blue: #0984E3;
+    --blue-bg: #E8F4FD;
+    --gray: #636E72;
+    --gray-bg: #F0F0F0;
+    --green: #00B894;
+    --green-bg: #E8FAF5;
+    --red-bg: #FFF0F0;
+    --red-text: #C0392B;
+    --yellow-bg: #FFF9E6;
+    --yellow-text: #8B6914;
+    --radius: 10px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-primary: rgba(255,255,255,0.9);
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-tertiary: rgba(255,255,255,0.4);
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #222;
+      --bg-tertiary: #2a2a2a;
+      --border: #3a3a3a;
+      --border-light: #333;
+      --purple-bg: #1E1A3A;
+      --teal-bg: #0A2A22;
+      --amber-bg: #2A1510;
+      --blue-bg: #0A1E2E;
+      --gray-bg: #2a2a2a;
+      --green-bg: #0A2A22;
+      --red-bg: #2A1010;
+      --red-text: #E74C3C;
+      --yellow-bg: #2A2510;
+      --yellow-text: #F1C40F;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+  .page { max-width: 780px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  .header { margin-bottom: 40px; }
+  .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .header p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+  .header .meta { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .header .meta span { font-size: 12px; color: var(--text-tertiary); background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px; }
+
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; padding: 12px 16px; background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: var(--radius); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .phase { margin-bottom: 36px; }
+  .phase-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; color: var(--text-tertiary); margin-bottom: 12px; padding-left: 4px; }
+
+  .step { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; background: var(--bg-secondary); overflow: hidden; }
+  .step-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
+  .step-header:hover { background: var(--bg-tertiary); }
+  .step-num { min-width: 28px; height: 28px; border-radius: 50%; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-info { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .step-subtitle { font-size: 12px; color: var(--text-secondary); }
+  .step-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .badge { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; padding: 2px 8px; border-radius: 4px; }
+  .badge-owner { background: var(--bg-tertiary); color: var(--text-secondary); }
+  .badge-system { background: var(--blue-bg); color: var(--blue); }
+  .badge-auto { background: var(--green-bg); color: var(--teal); }
+  .badge-manual { background: var(--yellow-bg); color: var(--yellow-text); }
+  .expand-icon { font-size: 16px; color: var(--text-tertiary); margin-top: 4px; transition: transform 0.2s; flex-shrink: 0; }
+  .step.open .expand-icon { transform: rotate(180deg); }
+
+  .step-details { display: none; border-top: 1px solid var(--border-light); padding: 14px 16px 14px 56px; }
+  .step.open .step-details { display: block; }
+  .detail-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+  .detail-label { min-width: 70px; font-weight: 500; color: var(--text-tertiary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; flex-shrink: 0; }
+  .detail-value { color: var(--text-primary); }
+  .detail-value.subtle { color: var(--text-secondary); }
+
+  .note { font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-top: 8px; line-height: 1.5; }
+  .note-resolved { background: var(--green-bg); color: var(--teal); }
+  .note-decision { background: var(--yellow-bg); color: var(--yellow-text); }
+  .note-info { background: var(--blue-bg); color: var(--blue); }
+
+  .arrow { text-align: center; color: var(--text-tertiary); font-size: 16px; margin: 2px 0; line-height: 1; }
+
+  .branch-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .branch { font-size: 12px; padding: 8px 10px; border-radius: 6px; line-height: 1.4; }
+  .branch-success { background: var(--green-bg); color: var(--teal); }
+  .branch-warn { background: var(--yellow-bg); color: var(--yellow-text); }
+  .branch-fail { background: var(--red-bg); color: var(--red-text); }
+  @media (max-width: 600px) { .branch-grid { grid-template-columns: 1fr; } }
+
+  .quality-section { margin-top: 48px; }
+  .quality-section h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+  .quality-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; background: var(--bg-secondary); }
+  .quality-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .quality-item { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 6px; padding-left: 16px; position: relative; }
+  .quality-item::before { content: "\2192"; position: absolute; left: 0; color: var(--text-tertiary); }
+
+  .n-gray .step-num { background: var(--gray-bg); color: var(--gray); }
+  .n-purple .step-num { background: var(--purple-bg); color: var(--purple); }
+  .n-teal .step-num { background: var(--teal-bg); color: var(--teal); }
+  .n-amber .step-num { background: var(--amber-bg); color: var(--amber); }
+  .n-blue .step-num { background: var(--blue-bg); color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <h1>Ad Bounty — Student Onboarding Flow</h1>
+  <p>Complete student journey from application to fully onboarded creator. Every step shows trigger, action, owner, system, output, and handoff. Click any step to expand details.</p>
+  <div class="meta">
+    <span>Version 2 — May 2026</span>
+    <span>6 steps across 4 phases</span>
+    <span>~1–3 days application to approval</span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Automated</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Manual — Karlo</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Manual — Zak</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Student</div>
+</div>
+
+<!-- PHASE 1 — Application -->
+<div class="phase">
+<div class="phase-label">Phase 1 — Application</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div class="step-info">
+      <div class="step-title">Student submits onboarding form</div>
+      <div class="step-subtitle">Tally form → system verifies Whop + Discord → creates student record automatically</div>
+      <div class="step-badges"><span class="badge badge-owner">Student</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">Tally → n8n → Supabase → ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student fills out Tally onboarding form (legal name, Discord username, email, country, Wise account details)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">SO workflow fires: resolves Discord user ID from username → verifies active Whop membership (2-step API: email → member → memberships) → checks for duplicate applications in Supabase → creates record if verified</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Student (submits form) → System (SO workflow, fully automated)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Whop API → Discord API → Supabase → ClickUp → Discord (#ops-digest + student DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Student record in Supabase (status=pending), ClickUp task in Creator Verification list, confirmation DM to student via Discord. #ops-digest notification tagging @Karlo with task link and "Review application" as next action.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Task appears in Creator Verification → Karlo reviews (Step 2)</div></div>
+    <div class="branch-grid">
+      <div class="branch branch-success"><strong>Verified + new</strong><br>Record created, ClickUp task, confirmation DM</div>
+      <div class="branch branch-warn"><strong>Already applied</strong><br>"Already applied" DM — no duplicate record</div>
+      <div class="branch branch-fail"><strong>Verification fails</strong><br>Rejection DM — no record created</div>
+    </div>
+    <div class="note note-info">Bypass path: Zak can trigger SO manually with pre-filled data for edge cases. Sets whop_bypass=true, skips Whop verification, otherwise same pipeline.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 2 — Review & Approval -->
+<div class="phase">
+<div class="phase-label">Phase 2 — Review & Approval</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div class="step-info">
+      <div class="step-title">Review application</div>
+      <div class="step-subtitle">Karlo reviews student info in ClickUp — checks identity, country, payment method</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp task appears in Creator Verification list (from Step 1) + #ops-digest notification tagging @Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Review the ClickUp task. Check: legal name, Discord username, country, payment method. Approval criteria: student must have a Wise account. Students from Wise-eligible countries without Wise are asked to set it up before approval.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp (Creator Verification list)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Decision: approve, request Wise setup, or reject</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Approve → Step 3. Reject → Karlo sends 1:1 Discord DM declining, moves task → Rejected. Request Wise → Karlo DMs student, task stays pending.</div></div>
+    <div class="note note-decision">Approval gate: Student must be on Wise. If from a Wise-eligible country without Wise, ask them to set it up first — don't approve until confirmed.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">3</div>
+    <div class="step-info">
+      <div class="step-title">Approve in ClickUp</div>
+      <div class="step-subtitle">Status → Approved triggers Creator ID generation + welcome DM with enrollment links</div>
+      <div class="step-badges"><span class="badge badge-owner">Karlo</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">ClickUp → n8n → Supabase → Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Karlo moves ClickUp task status → "Approved"</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">SA workflow fires: generates unique Creator ID (CREATOR-X7K9M2 format, 30-char alphanumeric set) → updates Supabase (status=approved, creator_id, approved_at) → fetches all active brands → sends Welcome DM with Creator ID + enrollment link for every active brand</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo (status change) → System (SA workflow)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp (webhook) → n8n → Supabase → Discord (student DM + #ops-digest)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Student has Creator ID + brand enrollment links via Discord DM. Supabase record updated. #ops-digest confirmation posted.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Student can now enroll in brands (Step 4). Ongoing membership verified daily (Phase 4).</div></div>
+    <div class="note note-resolved">Safety: Only pending → approved fires the workflow. Duplicate webhook events are no-ops — no double DMs, no errors. State machine guard enforced.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 3 — Brand Enrollment + Dashboard -->
+<div class="phase">
+<div class="phase-label">Phase 3 — Brand Enrollment + Dashboard</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">4</div>
+    <div class="step-info">
+      <div class="step-title">Student enrolls in a brand</div>
+      <div class="step-subtitle">Student fills brand-specific enrollment form → system validates, creates enrollment, sends submission link</div>
+      <div class="step-badges"><span class="badge badge-owner">Student</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">Tally → n8n → Supabase → ClickUp → Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student clicks enrollment link from welcome DM (Step 3) and fills brand-specific Tally form</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">BE workflow fires: validates creator_id → checks student is approved → fetches brand info → checks for existing enrollment → creates enrollment in Supabase → creates Dashboard Setup task in ClickUp → sends confirmation DM with submission link + brand brief</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Student (fills form) → System (BE workflow)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Supabase → ClickUp → Discord (student DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Enrollment record in Supabase (status=active), Dashboard Setup task in ClickUp, student gets submission link + brand brief via Discord DM</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Student can now submit creatives via universal submission form. Dashboard task → Zak sets up analytics dashboard (Step 5).</div></div>
+    <div class="branch-grid">
+      <div class="branch branch-success"><strong>Success</strong><br>Enrollment created, submission link delivered</div>
+      <div class="branch branch-warn"><strong>Already enrolled</strong><br>"Already enrolled" DM — no duplicate</div>
+      <div class="branch branch-fail"><strong>Not approved</strong><br>Rejected — student not in approved status</div>
+    </div>
+    <div class="note note-resolved">Duplicate enrollment protection: same check-before-write pattern as SO. One enrollment per student per brand enforced at Supabase level.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">5</div>
+    <div class="step-info">
+      <div class="step-title">Dashboard delivered to student</div>
+      <div class="step-subtitle">Zak sets up brand dashboard → marks complete in ClickUp → system DMs student the link</div>
+      <div class="step-badges"><span class="badge badge-owner">Zak</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">ClickUp → n8n → Supabase → Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Zak completes dashboard setup, moves ClickUp task "Dashboard Setup" → status "Complete"</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">DD workflow fires: gets ClickUp task → extracts enrollment_id + dashboard_url from custom fields → fetches enrollment → fetches student → fetches brand → stores dashboard_url in enrollments table → sends Dashboard DM to student with their personalized analytics link</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Zak (dashboard setup) → System (DD workflow, delivers DM)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp (webhook) → n8n → Supabase → Discord (student DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Student receives dashboard link via Discord DM. URL stored in enrollments.dashboard_url.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Complete — student is fully onboarded with submission link + dashboard access.</div></div>
+    <div class="note note-info">Dashboard URL is stored per-enrollment (not per-student) because each brand's dashboard is different.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 4 — Ongoing Verification -->
+<div class="phase">
+<div class="phase-label">Phase 4 — Ongoing Membership Verification</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">6</div>
+    <div class="step-info">
+      <div class="step-title">Daily Whop Check</div>
+      <div class="step-subtitle">Automated daily scan — pauses lapsed students, restores reactivated ones</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Whop API → Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Schedule: midnight UTC daily. Can also be triggered manually.</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">WC workflow fetches all students where whop_bypass=false → calls Whop API for each (2-step: email → member → memberships) → compares current vs. stored status → updates accordingly</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (WC workflow). Zak monitors via Ops Digest.</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Whop API → Supabase</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Per student: no change → last_checked updated · lapsed → student + all enrollments paused · reactivated → student + all enrollments restored</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Silent — no Discord DMs. Status changes visible in Ops Digest. Students with whop_bypass=true excluded entirely.</div></div>
+    <div class="note note-resolved">Fallback: If Whop API is unreachable, no changes are made — no data corruption. Stale last_checked timestamps in Ops Digest signal an issue.</div>
+  </div>
+</div>
+</div>
+
+<!-- QUALITY REVIEW -->
+<div class="quality-section">
+<h2>Quality Review</h2>
+
+<div class="quality-card">
+  <h3>1. What breaks?</h3>
+  <div class="quality-item"><strong>SO workflow fails on form submission (Step 1):</strong> No record, no DM, no ClickUp task. Signal: absence of #ops-digest notification. Student can re-submit (duplicate check handles gracefully). Check n8n execution logs.</div>
+  <div class="quality-item"><strong>SA workflow fails on approval (Step 3):</strong> Student stuck in "approved" state with no Creator ID. No welcome DM sent. Check n8n logs, re-trigger SA manually if needed.</div>
+  <div class="quality-item"><strong>SO runs twice on same submission (Step 1):</strong> Duplicate check catches it — sends "already applied" DM. No double records in Supabase.</div>
+  <div class="quality-item"><strong>SA fires on duplicate webhook event (Step 3):</strong> State machine guard catches it — only pending→approved transition proceeds. Already-approved students are no-ops.</div>
+  <div class="quality-item"><strong>BE workflow fails on enrollment (Step 4):</strong> No enrollment created, no DM sent. Student can re-submit (duplicate check handles gracefully). Check n8n execution logs.</div>
+  <div class="quality-item"><strong>DD workflow fails on dashboard delivery (Step 5):</strong> Student doesn't get dashboard link. Zak can re-trigger by toggling ClickUp task status back and forward, or send DM manually.</div>
+  <div class="quality-item"><strong>Whop API unreachable during daily check (Step 6):</strong> No status changes made, no data corruption. last_checked timestamps go stale — visible in Ops Digest.</div>
+</div>
+
+<div class="quality-card">
+  <h3>2. Who knows?</h3>
+  <div class="quality-item"><strong>SO/SA workflow failures:</strong> #ops-digest silence is the signal. Every successful completion posts a notification. Absence = check n8n logs.</div>
+  <div class="quality-item"><strong>BE/DD workflow failures:</strong> Same pattern — #ops-digest posts on success. Missing notification after enrollment or dashboard delivery = check n8n logs.</div>
+  <div class="quality-item"><strong>Whop check failures:</strong> Ops Digest shows check freshness. Stale last_checked timestamps = Zak investigates.</div>
+  <div class="quality-item"><strong>Student rejection:</strong> Only Karlo knows (manual DM). No system record of rejection reason — just ClickUp task → Rejected status.</div>
+  <div class="quality-item"><strong>Wise setup request:</strong> Karlo tracks in Discord DMs. Task stays pending until student confirms Wise account.</div>
+</div>
+
+<div class="quality-card">
+  <h3>3. What's the fallback?</h3>
+  <div class="quality-item"><strong>SO workflow down:</strong> Zak uses bypass path (manual trigger) to onboard student directly with pre-filled data.</div>
+  <div class="quality-item"><strong>SA workflow down:</strong> Zak manually generates Creator ID, updates Supabase, and sends welcome DM.</div>
+  <div class="quality-item"><strong>BE workflow down:</strong> Student can re-submit enrollment form. Duplicate protection prevents double-enrollments. Zak can manually create enrollment in Supabase and send DM.</div>
+  <div class="quality-item"><strong>DD workflow down:</strong> Zak sends dashboard link to student manually via Discord DM. Updates enrollments.dashboard_url in Supabase directly.</div>
+  <div class="quality-item"><strong>Whop API down:</strong> Students aren't paused/restored until next successful run. No data corruption. Monitored via Ops Digest.</div>
+  <div class="quality-item"><strong>Discord bot unreachable:</strong> Karlo can send DMs manually. Bot failure doesn't block the approval flow — just delays notification.</div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('open');
+}
+// Open first step by default
+document.querySelector('.step').classList.add('open');
+</script>
+</body>
+</html>

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Bounty — Brand Onboarding Flow v2</title>
+<style>
+  :root {
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-tertiary: #888;
+    --bg-primary: #fff;
+    --bg-secondary: #fafafa;
+    --bg-tertiary: #f3f3f3;
+    --border: #e0e0e0;
+    --border-light: #eee;
+    --purple: #6C5CE7;
+    --purple-bg: #F0EFFE;
+    --teal: #00B894;
+    --teal-bg: #E8FAF5;
+    --amber: #E17055;
+    --amber-bg: #FEF0EC;
+    --blue: #0984E3;
+    --blue-bg: #E8F4FD;
+    --gray: #636E72;
+    --gray-bg: #F0F0F0;
+    --green: #00B894;
+    --green-bg: #E8FAF5;
+    --red-bg: #FFF0F0;
+    --red-text: #C0392B;
+    --yellow-bg: #FFF9E6;
+    --yellow-text: #8B6914;
+    --radius: 10px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-primary: rgba(255,255,255,0.9);
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-tertiary: rgba(255,255,255,0.4);
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #222;
+      --bg-tertiary: #2a2a2a;
+      --border: #3a3a3a;
+      --border-light: #333;
+      --purple-bg: #1E1A3A;
+      --teal-bg: #0A2A22;
+      --amber-bg: #2A1510;
+      --blue-bg: #0A1E2E;
+      --gray-bg: #2a2a2a;
+      --green-bg: #0A2A22;
+      --red-bg: #2A1010;
+      --red-text: #E74C3C;
+      --yellow-bg: #2A2510;
+      --yellow-text: #F1C40F;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+  .page { max-width: 780px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  .header { margin-bottom: 40px; }
+  .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .header p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+  .header .meta { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .header .meta span { font-size: 12px; color: var(--text-tertiary); background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px; }
+
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; padding: 12px 16px; background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: var(--radius); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .phase { margin-bottom: 36px; }
+  .phase-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; color: var(--text-tertiary); margin-bottom: 12px; padding-left: 4px; }
+
+  .step { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; background: var(--bg-secondary); overflow: hidden; }
+  .step-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
+  .step-header:hover { background: var(--bg-tertiary); }
+  .step-num { min-width: 28px; height: 28px; border-radius: 50%; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-info { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .step-subtitle { font-size: 12px; color: var(--text-secondary); }
+  .step-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .badge { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; padding: 2px 8px; border-radius: 4px; }
+  .badge-owner { background: var(--bg-tertiary); color: var(--text-secondary); }
+  .badge-system { background: var(--blue-bg); color: var(--blue); }
+  .badge-auto { background: var(--green-bg); color: var(--teal); }
+  .badge-manual { background: var(--yellow-bg); color: var(--yellow-text); }
+  .expand-icon { font-size: 16px; color: var(--text-tertiary); margin-top: 4px; transition: transform 0.2s; flex-shrink: 0; }
+  .step.open .expand-icon { transform: rotate(180deg); }
+
+  .step-details { display: none; border-top: 1px solid var(--border-light); padding: 14px 16px 14px 56px; }
+  .step.open .step-details { display: block; }
+  .detail-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+  .detail-label { min-width: 70px; font-weight: 500; color: var(--text-tertiary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; flex-shrink: 0; }
+  .detail-value { color: var(--text-primary); }
+  .detail-value.subtle { color: var(--text-secondary); }
+
+  .note { font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-top: 8px; line-height: 1.5; }
+  .note-resolved { background: var(--green-bg); color: var(--teal); }
+  .note-decision { background: var(--yellow-bg); color: var(--yellow-text); }
+
+  .arrow { text-align: center; color: var(--text-tertiary); font-size: 16px; margin: 2px 0; line-height: 1; }
+
+  .parallel-label { font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 500; color: var(--text-tertiary); text-align: center; margin: 8px 0; }
+  .parallel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 600px) { .parallel-grid { grid-template-columns: 1fr; } }
+
+  .quality-section { margin-top: 48px; }
+  .quality-section h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+  .quality-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; background: var(--bg-secondary); }
+  .quality-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .quality-item { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 6px; padding-left: 16px; position: relative; }
+  .quality-item::before { content: "→"; position: absolute; left: 0; color: var(--text-tertiary); }
+
+  .n-gray .step-num { background: var(--gray-bg); color: var(--gray); }
+  .n-purple .step-num { background: var(--purple-bg); color: var(--purple); }
+  .n-teal .step-num { background: var(--teal-bg); color: var(--teal); }
+  .n-amber .step-num { background: var(--amber-bg); color: var(--amber); }
+  .n-blue .step-num { background: var(--blue-bg); color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <h1>Ad Bounty — Brand Onboarding Flow</h1>
+  <p>Complete onboarding journey from waitlist to live. Every step shows trigger, action, owner, system, output, and handoff. Click any step to expand details.</p>
+  <div class="meta">
+    <span>Version 2.1 — May 2026</span>
+    <span>23 steps across 5 phases</span>
+    <span>~2-3 weeks end-to-end</span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Automated</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Manual — Karlo</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Manual — Zak</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Brand owner</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gray)"></div> Team review</div>
+</div>
+
+<!-- PHASE 1 -->
+<div class="phase">
+<div class="phase-label">Phase 1 — Selection</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div class="step-info">
+      <div class="step-title">Waitlist form submitted</div>
+      <div class="step-subtitle">Brand applies via Tally form → system creates ClickUp task automatically</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">Tally → n8n → ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand submits waitlist form (tally.so/r/jaL8y9)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Workflow A parses form data, creates ClickUp task with all form data in custom fields, posts tagged notification to #ops-digest</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Workflow A)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → ClickUp → Discord (#ops-digest)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">ClickUp task (status: Waitlisted) with name, Discord handle, store URL, ad spend, creative volume. Task comment includes intake form link with task_id pre-filled. #ops-digest notification tagging @Karlo @Spencer @Zak.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Task appears on Brand Onboarding board → visible for weekly review</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-gray" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div class="step-info">
+      <div class="step-title">Weekly waitlist review</div>
+      <div class="step-subtitle">Team reviews new applicants together, selects brands to approach</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo + Spencer + Zak</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Weekly cadence (standing review meeting)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Review all tasks in Waitlisted status. Decide per brand: proceed to outreach, delay, or reject.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo + Spencer + Zak</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp (Brand Onboarding board)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Each applicant: selected for outreach, delayed (with reason in comment), or rejected</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Selected brands → Step 3. Rejected → Karlo sends short 1:1 DM declining. Delayed → task parked, revisit next review.</div></div>
+    <div class="note note-decision">Cadence: Weekly review. Any task in Waitlisted >14 days without a decision gets flagged.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase">
+<div class="phase-label">Phase 2 — Outreach + Contract</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">3</div>
+    <div class="step-info">
+      <div class="step-title">Create Discord group chat</div>
+      <div class="step-subtitle">Group DM with the team + brand owner — main communication channel for onboarding</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand selected for outreach in Step 2</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Create Discord group DM: Karlo + Zak + Spencer + brand owner. Search by Discord username (on ClickUp task) — no user ID needed.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Group DM channel exists. All onboarding communication happens here from this point forward.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 4 (send outreach in same channel)</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">4</div>
+    <div class="step-info">
+      <div class="step-title">Send outreach message + Loom</div>
+      <div class="step-subtitle">Program overview, pricing, how it works — brand gets the full picture</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Group chat created (Step 3)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Post outreach template message + Loom link in the group chat. Introduces the team, explains the program, shares pricing ($4k/mo or 10% of ad spend, whichever is higher).</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord (group DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand owner has: program overview Loom, pricing, marketplace framing, team introductions</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Brand responds → Step 5. No response → 48hr follow-up, then 5 days, then → Delayed.</div></div>
+    <div class="note note-resolved">Follow-up cadence: 48 hours → second message. 5 days → final ping. No response → move to Delayed with comment noting attempts.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">5</div>
+    <div class="step-info">
+      <div class="step-title">Brand confirms interest</div>
+      <div class="step-subtitle">Brand agrees on pricing and intent to proceed</div>
+      <div class="step-badges"><span class="badge badge-owner">Brand</span><span class="badge badge-system">Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand responds positively to outreach</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Brand verbally agrees on pricing, terms, and intent to proceed in the group chat</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Brand</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord (group DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Verbal agreement to proceed. Karlo's judgment call — if the brand says they want in and agree on pricing, that's confirmation.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Karlo messages Angie to generate contract → Step 6</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">6</div>
+    <div class="step-info">
+      <div class="step-title">Send PandaDoc contract</div>
+      <div class="step-subtitle">Formal contract with all terms, pricing, cancellation, and removal clauses</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Angie</span><span class="badge badge-system">PandaDoc</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Karlo messages Angie after verbal confirmation (Step 5)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Generate PandaDoc from template, send to brand owner via the group chat</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Angie (first contract: Karlo + Zak + Spencer together to finalize template)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">PandaDoc → Discord (group DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Contract delivered with: pricing ($4k/mo or 10%), monthly payouts, 7-day cancellation, 60-day post-cancellation payout window, graduated removal clause (warning → probation → removal)</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 7 (brand signs + pays)</div></div>
+    <div class="note note-decision">Dependency: PandaDoc template needs to be built before first brand reaches this step. Spencer builds from compiled terms doc.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">7</div>
+    <div class="step-info">
+      <div class="step-title">Brand signs contract + pays</div>
+      <div class="step-subtitle">Signed PandaDoc + first payment via Wise/wire</div>
+      <div class="step-badges"><span class="badge badge-owner">Brand</span><span class="badge badge-system">PandaDoc + Wise</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Contract delivered (Step 6)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Brand signs PandaDoc digitally + sends first payment via Wise or wire transfer</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Brand</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">PandaDoc (signature) + Wise/wire (payment)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Signed contract + payment confirmed by Karlo/Zak</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Payment confirmed → Step 8. No response after 48hrs → follow up. 5 days → final ping. Ghost → Delayed.</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">8</div>
+    <div class="step-info">
+      <div class="step-title">Mark as Approved in ClickUp</div>
+      <div class="step-subtitle">Payment confirmed — onboarding automation begins from here</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Zak</span><span class="badge badge-system">ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Signed contract + payment confirmed</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Move ClickUp task from Waitlisted → Approved</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Zak</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Task status = Approved. Intake form link is already in the task comments (placed there by Step 1).</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 9 (Karlo sends intake form link)</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase">
+<div class="phase-label">Phase 3 — Intake + Interview</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">9</div>
+    <div class="step-info">
+      <div class="step-title">Send intake form link in group chat</div>
+      <div class="step-subtitle">Karlo grabs the pre-generated link from ClickUp and shares it</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">Discord + ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Task moved to Approved (Step 8)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Copy intake form link from ClickUp task comment (pre-generated with task_id), post in group chat with context</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp (reference) → Discord (delivery)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand owner has intake form URL (tally.so/r/gD7rAD?task_id=xxx)</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 10 (brand fills out form)</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">10</div>
+    <div class="step-info">
+      <div class="step-title">Brand completes intake form</div>
+      <div class="step-subtitle">Video 1 + brand info → triggers full system setup (terms handled via PandaDoc)</div>
+      <div class="step-badges"><span class="badge badge-owner">Brand</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">Tally → n8n</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand clicks intake link from group chat</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Page 1: Watch Loom 1 (system overview). Page 2: Fill brand info (name, products, audience, etc). Submit → Workflow B fires. Terms already handled via PandaDoc (Step 6).</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Brand (fills form) → System (processes)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n (Workflow B) → Supabase + Google Drive + ClickUp + Discord</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">
+      • Supabase brand record created (status: draft)<br>
+      • Google Drive folder created ("[Brand] - Ad Bounty")<br>
+      • ClickUp submission list created (for future student submissions)<br>
+      • Ad account linked (if provided)<br>
+      �� Interview prompt saved as .txt file in Drive folder (shareable link)<br>
+      • ClickUp task → Intake Complete + comment with interview submission backup link<br>
+      • Brand Slug + UUID stored on task<br>
+      • #ops-digest notification tagging @Karlo with .txt link + action item
+    </div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Karlo sees #ops-digest → grabs .txt link → shares in group chat → Step 10b</div></div>
+    <div class="note note-decision">Ad Account Access: If Meta Ad Account ID was provided in the intake form, it's auto-inserted by the BS workflow. If not, Karlo sends the Leadsie link (https://app.leadsie.com/connect/to/easya-media/ad-bounty) to the brand owner in the group chat. Brand owner grants View Only access. Karlo verifies in Business Manager and adds to Supabase manually. This MUST be completed before go-live — CM/SP workflows need ad account access to pull creative and spend data.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">10b</div>
+    <div class="step-info">
+      <div class="step-title">Share interview prompt in group chat</div>
+      <div class="step-subtitle">Karlo grabs the .txt link and shares it with context</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">#ops-digest notification from Workflow B</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Grab .txt link from #ops-digest or ClickUp task comment. Post in group chat: "Here's your interview prompt — open it, copy the full text, paste into Claude (claude.ai). Takes 20-30 min. When done, paste the JSON output here: [submission form link]"</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord (group DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand owner has .txt link + interview submission form link in the group chat</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 11 (brand does interview). If no action after 3 days → Karlo follows up. 7 days → direct message. 14 days → escalate.</div></div>
+    <div class="note note-resolved">Follow-up cadence: 3 days → "How's the interview going?" 7 days → direct check-in. 14 days → team decides next steps.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">11</div>
+    <div class="step-info">
+      <div class="step-title">Claude interview (20-30 min)</div>
+      <div class="step-subtitle">Brand owner has deep conversation with Claude about their brand constraints</div>
+      <div class="step-badges"><span class="badge badge-owner">Brand</span><span class="badge badge-system">Claude (claude.ai)</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand opens Google Doc, copies prompt, pastes into Claude</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Claude walks through 5 sections: Product Claims, Niche Compliance, Brand Guidelines, Brand Safety, Interpretation. Probes for edge cases and specific rulings at each step.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Brand</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Claude (claude.ai)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Structured JSON with brand constraints across all 5 QA dimensions + gray area rulings + quick decision rules</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Brand copies JSON → Step 12</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">12</div>
+    <div class="step-info">
+      <div class="step-title">Brand submits interview JSON</div>
+      <div class="step-subtitle">Paste JSON into submission form → triggers prompt generation</div>
+      <div class="step-badges"><span class="badge badge-owner">Brand</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">Tally → n8n → Gemini</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand pastes JSON into interview submission form (tally.so/r/zxrO6a?task_id=xxx)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Workflow C validates JSON → stores interview_data on brand record → sends to Gemini 2.5 Pro → generates 5 QA prompts → upserts to Supabase (inactive) → stages brief materials on ClickUp task</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Brand (submits) → System (Workflow C processes)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Supabase + Gemini → ClickUp + Discord</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">
+      • interview_data stored on brand record (Supabase)<br>
+      • 5 QA prompts generated: Product Claims, Niche Compliance, Brand Guidelines, Brand Safety, Interpretation Guide (all active=false)<br>
+      • Brief materials staged on ClickUp task custom field<br>
+      • ClickUp task → Pending Review<br>
+      • Task comment with review checklist<br>
+      • #ops-digest notification
+    </div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Steps 13+14 (parallel: brief + QA review). If JSON invalid → error notification to #ops-digest, brand asked to re-submit.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 4 -->
+<div class="phase">
+<div class="phase-label">Phase 4 — Brief + QA Gates</div>
+
+<div class="parallel-label">Done simultaneously ↓</div>
+<div class="parallel-grid">
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">13</div>
+    <div class="step-info">
+      <div class="step-title">Build brand brief</div>
+      <div class="step-subtitle">Karlo creates Netlify brief page using interview data + brief materials</div>
+      <div class="step-badges"><span class="badge badge-owner">Karlo</span><span class="badge badge-system">Netlify</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Task → Pending Review (#ops-digest notification)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Build brand brief page on Netlify using brief materials from ClickUp task + interview data. This is the living resource students use to understand the brand.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Netlify (static page)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand brief URL on Netlify</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 15 (combined with QA review output)</div></div>
+  </div>
+</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">14</div>
+    <div class="step-info">
+      <div class="step-title">Review QA prompts</div>
+      <div class="step-subtitle">Zak reviews system-generated prompts, Karlo checks brand alignment</div>
+      <div class="step-badges"><span class="badge badge-owner">Zak + Karlo</span><span class="badge badge-system">Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Task → Pending Review (#ops-digest notification)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Gemini generated 5 draft prompts (Step 12). Zak reviews for technical accuracy (claims, compliance rules). Karlo reviews for brand voice alignment. Edits made directly in Supabase if needed. Zak mediates any Supabase access.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Zak (technical review) + Karlo (brand alignment)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Supabase (prompts table)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">5 reviewed QA prompts ready for brand sign-off</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 15 (combined with brief output)</div></div>
+    <div class="note note-resolved">Role clarity: Gemini generates, Zak + Karlo review and adjust, Zak handles Supabase. Karlo does NOT build prompts from scratch.</div>
+  </div>
+</div>
+
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">15</div>
+    <div class="step-info">
+      <div class="step-title">Send brief + QA summary to brand</div>
+      <div class="step-subtitle">Brand reviews both — brief and a plain-English QA summary</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Steps 13+14 complete</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Share in group chat: (1) Netlify brief link, (2) plain-English QA summary showing allowed claims, blocked claims, blocked competitors, strictness level, and top priority. NOT the raw AI prompts — a readable summary.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord (group DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand has brief + QA summary to review and approve</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 16. Max 2 revision rounds. If still misaligned after 2 rounds → schedule a call.</div></div>
+    <div class="note note-resolved">Brand sees a readable summary, not raw AI prompts. Example: "Claims we'll allow: [list]. Claims we'll block: [list]. Overall strictness: Strict."</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">16</div>
+    <div class="step-info">
+      <div class="step-title">Brand approves brief + QA gates</div>
+      <div class="step-subtitle">Confirmation in group chat — may take 1-2 revision rounds</div>
+      <div class="step-badges"><span class="badge badge-owner">Brand</span><span class="badge badge-system">Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand receives brief + QA summary (Step 15)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Brand reviews both docs, provides feedback or approves. Revisions handled in group chat.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Brand</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord (group DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Approved brief + QA gates</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Steps 17+18 (parallel: activate prompts + request test ads)</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="parallel-label">Done simultaneously ↓</div>
+<div class="parallel-grid">
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">17</div>
+    <div class="step-info">
+      <div class="step-title">Activate QA prompts</div>
+      <div class="step-subtitle">Set all 5 prompts to active in Supabase</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Zak</span><span class="badge badge-system">Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand approves QA gates (Step 16)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Set active=true on all 5 prompts in Supabase prompts table. Add brand_brief_url to the brand record.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Zak</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Supabase</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">QA system ready for this brand</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 19 (test ads)</div></div>
+  </div>
+</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">18</div>
+    <div class="step-info">
+      <div class="step-title">Request test ads from brand</div>
+      <div class="step-subtitle">5 image + 5 video ads from their existing library</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Zak</span><span class="badge badge-system">Discord + Drive</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand approves QA gates (Step 16)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Ask brand to upload 5 image + 5 video ads to their Google Drive folder (already created in Step 10)</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Zak (requests) → Brand (uploads)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord (request) → Google Drive (upload)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">10 test ads in the brand's Drive folder</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 19 (run through QA)</div></div>
+  </div>
+</div>
+
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">19</div>
+    <div class="step-info">
+      <div class="step-title">Run test ads through QA system</div>
+      <div class="step-subtitle">Validate QA gates make the right pass/fail decisions — max 2 adjustment rounds</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Zak + Karlo</span><span class="badge badge-system">n8n QA workflows</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Test ads uploaded (Step 18) + prompts active (Step 17)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Submit all 10 ads through QA pipeline using test creator ID (CREATOR-TEST). Review pass/fail decisions. If gates are wrong, Zak adjusts prompts and re-runs. Max 2 adjustment rounds — if still off, re-do the interview for deeper data.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Zak (submits + adjusts) + Karlo (reviews results)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n (QA workflows 2.0v2, 3.0v2, 5.0v2) + Supabase</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">10 validated QA results confirming gates are calibrated correctly</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Results confirmed → Step 20 (go-live sequence)</div></div>
+    <div class="note note-resolved">Test submission method: Use a dedicated CREATOR-TEST student record. Keeps the QA pipeline unchanged — no bypass needed.</div>
+    <div class="note note-decision">Calibration Loop: After initial QA testing, brand reviews results. If inconsistencies found (same creative passes then fails = interpretation issue), we enter the prompt calibration cycle:<br>1. Brand provides feedback on borderline cases (which should pass/fail and why)<br>2. Zak categorizes feedback by gate (B1-B4) and determines which prompt clause to adjust<br>3. Targeted prompt edits made in Supabase (never full replacement — surgical fixes)<br>4. Re-run the specific borderline creatives through the test script (3-5 runs per creative for consistency check)<br>5. If consistency is 80%+ and brand is satisfied → proceed to Step 20<br><br>Max 2 calibration rounds. If prompts still inconsistent after 2 rounds → re-do the interview for deeper data. Each creative is run 5-10 times to gauge consistency — different results on the same input means an interpretation issue exists.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 5 -->
+<div class="phase">
+<div class="phase-label">Phase 5 — Go Live</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">20</div>
+    <div class="step-info">
+      <div class="step-title">Send Video 2 — Mindset</div>
+      <div class="step-subtitle">Marketplace framing: be present, incentivize students, treat them like teammates</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Test ads validated (Step 19)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Send Loom 2 in group chat. Reframes it as a marketplace, not a service. Students choose which brands to work with. Brand needs to attract students — be present, share data, engage.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord (group DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand owner understands marketplace dynamic and their role in attracting students</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 21</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">21</div>
+    <div class="step-info">
+      <div class="step-title">Invite brand to EcomTalent Discord</div>
+      <div class="step-subtitle">Brand owner joins the server + gets "EcomTalent for Brands" role</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Video 2 sent (Step 20)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Check if brand owner is already in the EcomTalent server. If not, send invite. Assign "EcomTalent for Brands" role for correct channel access.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord (EcomTalent server)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand owner in server with correct role and channel visibility</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 22</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">22</div>
+    <div class="step-info">
+      <div class="step-title">Brand goes live</div>
+      <div class="step-subtitle">Channel created → brand activated → students notified (in this order)</div>
+      <div class="step-badges"><span class="badge badge-owner">Karlo → Zak</span><span class="badge badge-system">Discord + Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand owner in server with role (Step 21)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Sequence matters — do in this order:<br>1. Karlo creates brand chat channel in Discord<br>2. Karlo confirms channel is ready<br>3. Zak sets brand status → active + activated_at in Supabase<br>4. Zak manually triggers BLA workflow from n8n → students notified about new brand with enrollment link</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo (channel) → Zak (Supabase activation)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord + Supabase + n8n (BLA workflow)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand channel live, brand status = active, students notified and can enroll</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 23</div></div>
+    <div class="note note-decision">Critical sequence: Channel MUST exist before BLA is triggered. Zak confirms all 3 prerequisites (channel ready, status=active, prompts active) before manually triggering BLA. BLA is NOT automatic — it requires intentional human trigger.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">23</div>
+    <div class="step-info">
+      <div class="step-title">Send Video 3 + go-live message</div>
+      <div class="step-subtitle">KPIs, ClickUp walkthrough, do's and don'ts, positive reinforcement loop</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand live in community (Step 22)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Send in group chat: Loom 3 (how to win) + go-live message with KPIs, commitments, payment terms summary, removal policy, and support contacts</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord (group DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand owner has: ClickUp walkthrough, KPIs (time-to-review, time-to-launch, submission velocity), positive/negative reinforcement explained, operational playbook</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Onboarding complete. Brand operates in steady state. ClickUp task → Active.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- QUALITY REVIEW -->
+<div class="quality-section">
+<h2>Quality Review</h2>
+
+<div class="quality-card">
+  <h3>1. What breaks?</h3>
+  <div class="quality-item"><strong>Brand never responds to outreach (Steps 4→5):</strong> 48hr → 5 day → final ping follow-up cadence. Then → Delayed.</div>
+  <div class="quality-item"><strong>Brand never completes interview (Step 11):</strong> 3 day → 7 day → 14 day escalation. Highest friction point in the flow.</div>
+  <div class="quality-item"><strong>Brand never signs contract (Steps 6→7):</strong> Same follow-up cadence. Ghost → Delayed.</div>
+  <div class="quality-item"><strong>Test ads reveal bad QA gates (Step 19):</strong> Max 2 adjustment rounds. If still wrong → re-do interview for deeper data.</div>
+  <div class="quality-item"><strong>Gemini fails during Workflow C (Step 12):</strong> Re-submit the interview JSON (idempotent). P1 fix: add failure notification to #ops-digest.</div>
+  <div class="quality-item"><strong>Workflow B runs twice (Step 10):</strong> Brand record is safe (UNIQUE brand_id). But Drive folder and ClickUp list would duplicate. Manual cleanup needed — rare scenario.</div>
+</div>
+
+<div class="quality-card">
+  <h3>2. Who knows?</h3>
+  <div class="quality-item"><strong>Workflow A or B fails silently:</strong> Brand submits form but nothing happens. All workflows now post to #ops-digest on success — absence of notification = something failed. Check n8n execution logs.</div>
+  <div class="quality-item"><strong>Brand stalls between Steps 4-7:</strong> No automation — relies on Karlo's follow-up cadence in the group chat. Group chat makes it visible to the whole team.</div>
+  <div class="quality-item"><strong>Angie needs to send PandaDoc:</strong> Triggered by Karlo messaging her. No system notification. Acceptable at current volume.</div>
+  <div class="quality-item"><strong>Brand status drift (Supabase vs ClickUp):</strong> Both must be updated at go-live (Step 22). Manual sync — source of truth is Supabase.</div>
+</div>
+
+<div class="quality-card">
+  <h3>3. What's the fallback?</h3>
+  <div class="quality-item"><strong>Interview prompt .txt creation fails:</strong> Karlo can paste the prompt template manually into a file. Template exists in master_interview_prompt.md.</div>
+  <div class="quality-item"><strong>Any workflow fails:</strong> All form links and backup links are in ClickUp task comments. Karlo can share manually.</div>
+  <div class="quality-item"><strong>Gemini prompt generation fails:</strong> Re-submit interview JSON. Upserts are idempotent — no duplicates.</div>
+  <div class="quality-item"><strong>PandaDoc fails:</strong> Send PDF contract manually via group chat.</div>
+  <div class="quality-item"><strong>Discord bot unreachable:</strong> All communication is in the group chat (human-driven). Bot failure doesn't block the flow.</div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('open');
+}
+// Open first step by default
+document.querySelector('.step').classList.add('open');
+</script>
+</body>
+</html>

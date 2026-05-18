@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Bounty — QA Pipeline Flow</title>
+<style>
+  :root {
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-tertiary: #888;
+    --bg-primary: #fff;
+    --bg-secondary: #fafafa;
+    --bg-tertiary: #f3f3f3;
+    --border: #e0e0e0;
+    --border-light: #eee;
+    --purple: #6C5CE7;
+    --purple-bg: #F0EFFE;
+    --teal: #00B894;
+    --teal-bg: #E8FAF5;
+    --amber: #E17055;
+    --amber-bg: #FEF0EC;
+    --blue: #0984E3;
+    --blue-bg: #E8F4FD;
+    --gray: #636E72;
+    --gray-bg: #F0F0F0;
+    --green: #00B894;
+    --green-bg: #E8FAF5;
+    --red-bg: #FFF0F0;
+    --red-text: #C0392B;
+    --yellow-bg: #FFF9E6;
+    --yellow-text: #8B6914;
+    --radius: 10px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-primary: rgba(255,255,255,0.9);
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-tertiary: rgba(255,255,255,0.4);
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #222;
+      --bg-tertiary: #2a2a2a;
+      --border: #3a3a3a;
+      --border-light: #333;
+      --purple-bg: #1E1A3A;
+      --teal-bg: #0A2A22;
+      --amber-bg: #2A1510;
+      --blue-bg: #0A1E2E;
+      --gray-bg: #2a2a2a;
+      --green-bg: #0A2A22;
+      --red-bg: #2A1010;
+      --red-text: #E74C3C;
+      --yellow-bg: #2A2510;
+      --yellow-text: #F1C40F;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+  .page { max-width: 780px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  .header { margin-bottom: 40px; }
+  .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .header p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+  .header .meta { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .header .meta span { font-size: 12px; color: var(--text-tertiary); background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px; }
+
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; padding: 12px 16px; background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: var(--radius); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .phase { margin-bottom: 36px; }
+  .phase-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; color: var(--text-tertiary); margin-bottom: 12px; padding-left: 4px; }
+
+  .step { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; background: var(--bg-secondary); overflow: hidden; }
+  .step-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
+  .step-header:hover { background: var(--bg-tertiary); }
+  .step-num { min-width: 28px; height: 28px; border-radius: 50%; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-info { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .step-subtitle { font-size: 12px; color: var(--text-secondary); }
+  .step-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .badge { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; padding: 2px 8px; border-radius: 4px; }
+  .badge-owner { background: var(--bg-tertiary); color: var(--text-secondary); }
+  .badge-system { background: var(--blue-bg); color: var(--blue); }
+  .badge-auto { background: var(--green-bg); color: var(--teal); }
+  .badge-manual { background: var(--yellow-bg); color: var(--yellow-text); }
+  .expand-icon { font-size: 16px; color: var(--text-tertiary); margin-top: 4px; transition: transform 0.2s; flex-shrink: 0; }
+  .step.open .expand-icon { transform: rotate(180deg); }
+
+  .step-details { display: none; border-top: 1px solid var(--border-light); padding: 14px 16px 14px 56px; }
+  .step.open .step-details { display: block; }
+  .detail-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+  .detail-label { min-width: 70px; font-weight: 500; color: var(--text-tertiary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; flex-shrink: 0; }
+  .detail-value { color: var(--text-primary); }
+
+  .note { font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-top: 8px; line-height: 1.5; }
+  .note-resolved { background: var(--green-bg); color: var(--teal); }
+  .note-decision { background: var(--yellow-bg); color: var(--yellow-text); }
+  .note-info { background: var(--blue-bg); color: var(--blue); }
+
+  .arrow { text-align: center; color: var(--text-tertiary); font-size: 16px; margin: 2px 0; line-height: 1; }
+
+  .branch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .branch { font-size: 12px; padding: 8px 10px; border-radius: 6px; line-height: 1.4; }
+  .branch-success { background: var(--green-bg); color: var(--teal); }
+  .branch-fail { background: var(--red-bg); color: var(--red-text); }
+  @media (max-width: 600px) { .branch-grid { grid-template-columns: 1fr; } }
+
+  .parallel-label { font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 500; color: var(--text-tertiary); text-align: center; margin: 8px 0; }
+  .parallel-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 600px) { .parallel-grid { grid-template-columns: 1fr; } }
+
+  .gate-section { margin-top: 32px; margin-bottom: 32px; }
+  .gate-section h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .gate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gate { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; background: var(--bg-secondary); }
+  .gate-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .gate-desc { font-size: 12px; color: var(--text-secondary); }
+  @media (max-width: 600px) { .gate-grid { grid-template-columns: 1fr; } }
+
+  .quality-section { margin-top: 48px; }
+  .quality-section h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+  .quality-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; background: var(--bg-secondary); }
+  .quality-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .quality-item { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 6px; padding-left: 16px; position: relative; }
+  .quality-item::before { content: "\2192"; position: absolute; left: 0; color: var(--text-tertiary); }
+
+  .n-gray .step-num { background: var(--gray-bg); color: var(--gray); }
+  .n-purple .step-num { background: var(--purple-bg); color: var(--purple); }
+  .n-teal .step-num { background: var(--teal-bg); color: var(--teal); }
+  .n-amber .step-num { background: var(--amber-bg); color: var(--amber); }
+  .n-blue .step-num { background: var(--blue-bg); color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <h1>Ad Bounty — QA Pipeline Flow</h1>
+  <p>Creative QA journey from student submission through AI evaluation to approval or revision. Every step shows trigger, action, owner, system, output, and handoff. Click any step to expand details.</p>
+  <div class="meta">
+    <span>Version 1.1 — May 2026 (verified)</span>
+    <span>7 steps across 5 phases</span>
+    <span>7 workflows · 7 QA gates</span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Automated</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Manual — Karlo</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Manual — Zak</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Student</div>
+</div>
+
+<!-- QA GATES REFERENCE -->
+<div class="gate-section">
+  <h2>QA Gates</h2>
+  <div class="gate-grid">
+    <div class="gate"><div class="gate-name">T1 Visual Quality</div><div class="gate-desc">Image clarity, design integrity</div></div>
+    <div class="gate"><div class="gate-name">B1 Brand Voice</div><div class="gate-desc">Tone, language alignment</div></div>
+    <div class="gate"><div class="gate-name">T2 Spatial Analysis</div><div class="gate-desc">Format compliance, safe zones</div></div>
+    <div class="gate"><div class="gate-name">B2 Visual Brand</div><div class="gate-desc">Colors, style consistency</div></div>
+    <div class="gate"><div class="gate-name">T3 Compliance</div><div class="gate-desc">Text accuracy, Meta policies, pricing</div></div>
+    <div class="gate"><div class="gate-name">B3 Claims</div><div class="gate-desc">Accuracy, restrictions</div></div>
+    <div class="gate" style="grid-column: 2"><div class="gate-name">B4 Guidelines</div><div class="gate-desc">Brand-specific rules</div></div>
+  </div>
+</div>
+
+<!-- PHASE 1 — Submission Capture -->
+<div class="phase">
+<div class="phase-label">Phase 1 — Submission Capture</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div class="step-info">
+      <div class="step-title">Student submits creative</div>
+      <div class="step-subtitle">Tally form → validates creator + brand → uploads to Drive → creates ClickUp task</div>
+      <div class="step-badges"><span class="badge badge-owner">Student</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">Tally → n8n → Drive → ClickUp → Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student submits via universal form (tally.so/r/9qQYk1) — pre-filled with creator_id + brand_id from their enrollment link</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">1.0v2 workflow: validates creator_id (approved?) → validates brand_id (active?) → uploads files to Google Drive with standardized naming → creates ClickUp task in brand's list → writes submission to Supabase → sends confirmation DM</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Student (submits) → System (1.0v2 workflow)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Supabase → Google Drive → ClickUp → Discord</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">ClickUp task (status: "Technical QA"), Supabase submission record, files in Drive with standardized names, confirmation DM to student. #ops-digest notification.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Task status "Technical QA" triggers Step 2</div></div>
+    <div class="note note-info">File naming: {BrandName} - Ad Bounty - {CreatorName} - {CreatorID} - {TaskID} - {Variation}.{ext}</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 2 — Technical QA -->
+<div class="phase">
+<div class="phase-label">Phase 2 — Technical QA</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div class="step-info">
+      <div class="step-title">Technical QA evaluation (T1–T3)</div>
+      <div class="step-subtitle">Gemini evaluates visual quality, spatial compliance, and Meta policy adherence</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Gemini → Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp task status = "technical qa"</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">2.0v2 workflow: reads T1–T3 prompts from Supabase → sends creative to Gemini 2.5 Pro (3 parallel API calls for images to prevent lens-switching; 1 call for video via File API) → writes pass/fail results to Supabase</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (2.0v2 workflow)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (prompts) → Gemini 2.5 Pro API → Supabase (results) → ClickUp (status update)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">T1–T3 pass/fail results written to submission record. ClickUp task status advances.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All 3 pass → "brand qa" (Step 3). Any fail → revision flow (Step 4a).</div></div>
+    <div class="branch-grid">
+      <div class="branch branch-success"><strong>All T1–T3 pass</strong><br>→ Brand QA (Step 3)</div>
+      <div class="branch branch-fail"><strong>Any gate fails</strong><br>→ Revision Request (Step 4a)</div>
+    </div>
+    <div class="note note-resolved">Why 3 parallel calls for images: prevents "lens-switching" confusion in the model. Each gate evaluates independently with its own context. Videos use 1 call via File API (required for files >20MB).</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 3 — Brand QA -->
+<div class="phase">
+<div class="phase-label">Phase 3 — Brand QA</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">3</div>
+    <div class="step-info">
+      <div class="step-title">Brand QA evaluation (B1–B4)</div>
+      <div class="step-subtitle">Gemini evaluates brand voice, visual identity, claims, and brand-specific guidelines</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Gemini → Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp task status = "brand qa"</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">3.0v2 workflow: reads B1–B4 prompts from Supabase (brand-specific, generated during onboarding) → sends creative to Gemini 2.5 Pro → writes pass/fail results to Supabase</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (3.0v2 workflow)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (brand prompts) → Gemini 2.5 Pro API → Supabase (results) → ClickUp (status update)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">B1–B4 pass/fail results written to submission record. ClickUp task status advances.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All 4 pass → "approved" (Step 5). Any fail → revision flow (Step 4a).</div></div>
+    <div class="branch-grid">
+      <div class="branch branch-success"><strong>All B1–B4 pass</strong><br>→ Grading (Step 5)</div>
+      <div class="branch branch-fail"><strong>Any gate fails</strong><br>→ Revision Request (Step 4a)</div>
+    </div>
+    <div class="note note-info">Brand prompts are generated via Claude interview + Gemini during brand onboarding. Each brand has 5 prompts: B1–B4 + brand_interpretation guide. Managed by Zak in Supabase.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 4 — Revision Flow -->
+<div class="phase">
+<div class="phase-label">Phase 4 — Revision Flow</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">4a</div>
+    <div class="step-info">
+      <div class="step-title">Revision request sent</div>
+      <div class="step-subtitle">Student receives specific feedback via Discord DM — which gates failed and what to fix</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Technical QA or Brand QA failure (any gate fails)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.2 workflow: builds feedback message from QA results → sends Discord DM to student with specific issues (which gates failed, what to fix)</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (4.2 workflow)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Discord (student DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Student has actionable feedback via Discord DM. ClickUp task status = "Revision Requested."</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Student revises creative and re-submits → Step 4c</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">4b</div>
+    <div class="step-info">
+      <div class="step-title">Manual approval override</div>
+      <div class="step-subtitle">Karlo overrides QA for edge cases — creative is correct but gates disagree</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">n8n → ClickUp → Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Karlo decides a submission should be approved despite QA failure</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Karlo manually triggers 4.1 workflow for the specific submission. Bypasses QA results, marks submission as approved.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n (4.1 workflow) → ClickUp + Supabase</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Submission status = approved. Skips directly to grading (Step 5).</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 5 (Grading)</div></div>
+    <div class="note note-decision">Use sparingly — only for edge cases where the creative is clearly correct but the AI gates disagree. Override rate is tracked as a KPI.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">4c</div>
+    <div class="step-info">
+      <div class="step-title">Re-submission</div>
+      <div class="step-subtitle">Student submits revised creative → old files archived → full QA re-run</div>
+      <div class="step-badges"><span class="badge badge-owner">Student</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">Tally → n8n → Supabase → Drive → ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student submits revised creative via Tally form (link provided in the revision feedback DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.3 workflow: marks old Supabase submission records as "resubmitted" → archives old files in Drive → uploads new files with standardized naming → creates new Supabase submission records → re-enters QA flow at Phase 2 (Technical QA)</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Student (re-submits) → System (4.3 workflow)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Supabase → Google Drive → ClickUp</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Old submission records marked "resubmitted" (excluded from dashboard counts). Old files archived in Drive. New files uploaded + new submission records created. Submission re-enters Technical QA.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Phase 2 (Technical QA) — full pipeline re-run from Step 2</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 5 — Grading + Notification -->
+<div class="phase">
+<div class="phase-label">Phase 5 — Grading + Notification</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">5</div>
+    <div class="step-info">
+      <div class="step-title">Grade and notify</div>
+      <div class="step-subtitle">Gemini grades the creative → media buyer + student notified via Discord</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Gemini → Supabase → Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp task status = "approved"</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">5.0v2 workflow: reads grading prompt from Supabase → sends creative to Gemini → writes grade to submission record → sends Discord DM to media buyer (creative ready to launch) + Discord DM to student (approved + grade)</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (5.0v2 workflow)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (grading prompt) → Gemini 2.5 Pro → Supabase (grade) → Discord (media buyer DM + student DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Submission graded in Supabase. Media buyer notified (can launch ad). Student notified (creative approved + grade).</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Media buyer launches creative on Meta. Creative enters Ad Lifecycle tracking (Daily Creative Matching → Spend Pull → Payouts).</div></div>
+    <div class="note note-resolved">This is the end of the QA pipeline. What happens next is tracked in the Ad Lifecycle & Payouts process — creative matching, spend tracking, and student payouts.</div>
+  </div>
+</div>
+</div>
+
+<!-- QUALITY REVIEW -->
+<div class="quality-section">
+<h2>Quality Review</h2>
+
+<div class="quality-card">
+  <h3>1. What breaks?</h3>
+  <div class="quality-item"><strong>1.0v2 fails on submission (Step 1):</strong> No ClickUp task, no confirmation DM. Signal: #ops-digest silence. Student can re-submit — duplicate handling is safe.</div>
+  <div class="quality-item"><strong>2.0v2 or 3.0v2 Gemini call fails (Steps 2–3):</strong> Submission stuck in "technical qa" or "brand qa" status. No bad data written. Check n8n logs, re-trigger the workflow.</div>
+  <div class="quality-item"><strong>4.2 revision DM fails (Step 4a):</strong> Student doesn't know what to fix. Task shows "Revision Requested" but no DM received. Karlo can manually relay feedback from the ClickUp task.</div>
+  <div class="quality-item"><strong>5.0v2 grading fails (Step 5):</strong> Submission approved but ungraded. Media buyer not notified. Re-trigger 5.0v2.</div>
+  <div class="quality-item"><strong>Duplicate submission (same files):</strong> Each gets its own QA run. Not deduplicated — acceptable at current volume.</div>
+</div>
+
+<div class="quality-card">
+  <h3>2. Who knows?</h3>
+  <div class="quality-item"><strong>All workflow completions post to #ops-digest.</strong> Silence = failure. Check n8n execution logs.</div>
+  <div class="quality-item"><strong>QA results visible on ClickUp task + Ops Dashboard.</strong> Per-gate pass rates tracked per brand.</div>
+  <div class="quality-item"><strong>Karlo sees all submissions in ClickUp</strong> and can spot stuck items (tasks sitting in a status too long).</div>
+  <div class="quality-item"><strong>Override rate tracked on Ops Dashboard.</strong> High override rate for a brand = prompts need adjustment.</div>
+</div>
+
+<div class="quality-card">
+  <h3>3. What's the fallback?</h3>
+  <div class="quality-item"><strong>Any workflow down:</strong> Karlo can manually approve via 4.1 as an interim measure. QA results still in ClickUp + Supabase once workflows resume.</div>
+  <div class="quality-item"><strong>Gemini API down:</strong> All QA pauses. No bad data written. Resume when API returns — submissions stay in their current status.</div>
+  <div class="quality-item"><strong>Discord bot down:</strong> DMs delayed but QA pipeline keeps running. All results still recorded in ClickUp + Supabase. Karlo can relay feedback manually.</div>
+  <div class="quality-item"><strong>QA gates miscalibrated for a brand:</strong> Zak adjusts prompts in Supabase. Re-run affected submissions. Max 2 adjustment rounds — if still off, re-do brand interview.</div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('open');
+}
+// Open first step by default
+document.querySelector('.step').classList.add('open');
+</script>
+</body>
+</html>
