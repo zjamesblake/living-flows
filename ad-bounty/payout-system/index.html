@@ -147,9 +147,30 @@
 <!-- ROLES -->
 <div class="role-grid">
   <div class="role"><div class="role-name">Zak</div><div class="role-desc">Runs skills, reviews outputs, approves payouts and adjustments</div></div>
-  <div class="role"><div class="role-name">Ghed</div><div class="role-desc">Creates Atria snapshots, sends Wise payments, applies Whop promo codes, confirms brand payments received</div></div>
-  <div class="role"><div class="role-name">Angie</div><div class="role-desc">Invoices brands based on spend totals</div></div>
+  <div class="role"><div class="role-name">Ghed</div><div class="role-desc">Creates Atria snapshots, sends Wise payments, applies Whop promo codes, confirms brand payments received, maintains student payment info</div></div>
+  <div class="role"><div class="role-name">Angie</div><div class="role-desc">Invoices brands based on spend totals, marks invoices sent in dashboard</div></div>
   <div class="role"><div class="role-name">Lovro</div><div class="role-desc">Fields student support tickets, verifies adjustment claims</div></div>
+</div>
+
+<!-- RESPONSIBILITIES BY PHASE -->
+<div class="schema-section">
+  <h2>Responsibilities by Phase</h2>
+  <p style="font-size:12px; color:var(--text-secondary); margin-bottom:10px;">Each monthly cycle moves through five phases. The owner column shows whose hands the work is in.</p>
+  <table class="schema-table">
+    <thead>
+      <tr><th>Phase</th><th>Owner</th><th>What they do</th><th>Where</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>A. Calculate</strong></td><td>Zak</td><td>Runs <code>/payout-pull</code> &rarr; <code>/payout-match</code> &rarr; <code>/payout-reconcile</code> &rarr; <code>/payout-calculate</code>. Reviews reconciliation reports before advancing.</td><td>Claude Code</td></tr>
+      <tr><td><strong>B. Send (students)</strong></td><td>Zak</td><td>Runs <code>/payout-approve</code> to create ClickUp tasks, then <code>/payout-notify</code> + <code>/payout-announce</code> for Discord.</td><td>Claude Code &rarr; ClickUp &rarr; Discord</td></tr>
+      <tr><td></td><td>Ghed</td><td>For each ClickUp task in Payout Review list: pays student via Wise, pastes Wise transfer reference into <code>Payment Reference</code> field, sets task status to <strong>paid</strong>. Applies Whop promo codes for sub-$20 students.</td><td>Wise &rarr; ClickUp</td></tr>
+      <tr><td><strong>C. Invoice + receive</strong></td><td>Angie</td><td>Sends invoice to each brand for amount in <code>brand_invoices.invoice_amount</code>. Marks &ldquo;Sent&rdquo; in dashboard &rarr; sets <code>sent_at</code>.</td><td>External tool &rarr; Dashboard <code>/invoices</code></td></tr>
+      <tr><td></td><td>Ghed</td><td>When brand wires payment, marks invoice &ldquo;Paid&rdquo; in dashboard with <strong>payment reference + amount + date</strong>. Updates student payment info (Wise email, bank) in <code>/students</code> tab as needed.</td><td>Dashboard <code>/invoices</code> + <code>/students</code></td></tr>
+      <tr><td><strong>D. Verify + close</strong></td><td>Zak</td><td>Runs <code>/payout-finalize</code>. Skill 8 verifies every Wise transfer + every brand invoice payment automatically. Period locks only if all checks pass.</td><td>Claude Code (Wise API + Supabase)</td></tr>
+      <tr><td><strong>E. Adjustments</strong></td><td>Lovro</td><td>Triages student support tickets. Verifies ad exists, has spend, belongs to student. Hands documented case to Zak.</td><td>Discord / support inbox</td></tr>
+      <tr><td></td><td>Zak</td><td>Runs <code>/payout-adjust &lt;period_id&gt; &lt;student_id&gt; &lt;new_amount&gt; &lt;reason&gt;</code>. Creates additive adjustment record + ClickUp task for delta payment + audit log entry.</td><td>Claude Code</td></tr>
+    </tbody>
+  </table>
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
