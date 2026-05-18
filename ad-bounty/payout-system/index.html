@@ -493,6 +493,69 @@
 </div>
 </div>
 
+<!-- VERIFICATION CONTROLS -->
+<div class="section-divider">
+  <h2>Verification Controls &mdash; How We Guarantee Every Dollar</h2>
+  <p>Five guarantees, each enforced by a specific mechanism. If a guarantee can&rsquo;t be proven, the period cannot close.</p>
+</div>
+
+<div class="schema-section">
+  <table class="schema-table">
+    <thead>
+      <tr><th style="width:22%">Guarantee</th><th style="width:18%">Mechanism</th><th>Detail</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Calculated &rarr; Owed</strong><br><span style="color:var(--text-tertiary); font-size:11px;">Sums add up correctly</span></td>
+        <td>Reconciliation R1&ndash;R8</td>
+        <td>R4: brand spend = sum of student spend. R5: total spend = sum of all student spend. R6: total payout = sum of all payouts. R7: brand payout = sum of brand&rsquo;s student payouts. R3: Meta totals = Atria totals. Any failure stops the skill.</td>
+      </tr>
+      <tr>
+        <td><strong>Owed &rarr; Sent (students)</strong><br><span style="color:var(--text-tertiary); font-size:11px;">Wise actually moved the right amount</span></td>
+        <td>Skill 8 + Wise API</td>
+        <td>For every <code>paid</code> ClickUp task, Skill 8 pulls the Payment Reference, calls Wise API, confirms: (1) transfer exists, (2) amount within $0.50 of calculated, (3) status in {<code>outgoing_payment_sent</code>, <code>funds_converted</code>, <code>processing</code>}. Mismatch &rarr; status <strong>flagged</strong>, period stays open, <code>#ops-digest</code> alerts.</td>
+      </tr>
+      <tr>
+        <td><strong>Owed &rarr; Received (brands)</strong><br><span style="color:var(--text-tertiary); font-size:11px;">Brand actually paid the invoiced amount</span></td>
+        <td>Skill 8 invoice check</td>
+        <td>For every <code>brand_invoices</code> row: status must be <code>paid</code> or <code>verified</code>, <code>payment_amount</code> must be set, and <code>|payment_amount &minus; invoice_amount| &le; $0.50</code>. Any miss &rarr; period stays open. <span style="color:var(--purple)">(Amount-match check added 2026-05-18.)</span></td>
+      </tr>
+      <tr>
+        <td><strong>Adjustments</strong><br><span style="color:var(--text-tertiary); font-size:11px;">Every change documented + reversible</span></td>
+        <td><code>/payout-adjust</code> + audit_log</td>
+        <td>Dashboard cannot edit payout amounts &mdash; only <code>/payout-adjust</code> can. Each adjustment writes an additive row in <code>payout_adjustments</code> (original amount preserved on <code>original_payout_usd</code>) and an <code>audit_log</code> entry. Delta payment auto-creates a new ClickUp task for Ghed.</td>
+      </tr>
+      <tr>
+        <td><strong>Visibility</strong><br><span style="color:var(--text-tertiary); font-size:11px;">Anyone can see current state without asking</span></td>
+        <td>Ops Dashboard</td>
+        <td><code>/payouts</code> &mdash; period P&amp;L, drill to student &rarr; brand &rarr; ad. <code>/invoices</code> &mdash; brand invoice lifecycle. <code>/students</code> &mdash; payment info edits (Ghed&rsquo;s self-service). <code>/activity</code> &mdash; audit log feed. Hosted at ad-bounty-dashboard.vercel.app.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="gate-section">
+  <h2>Known Gaps &mdash; What We Can&rsquo;t Yet Catch</h2>
+  <div class="gate-grid">
+    <div class="gate" style="border-color:var(--yellow-text);">
+      <div class="gate-name" style="color:var(--yellow-text);">Direct-write bypass</div>
+      <div class="gate-desc">If someone sets <code>payout_periods.status = 'complete'</code> directly in Supabase (as happened to April), Skill 8 verification never runs. No trigger yet enforces audit-on-write. Mitigation: only Zak has service-role access; recovery is to re-run finalize after backfilling references.</div>
+    </div>
+    <div class="gate" style="border-color:var(--yellow-text);">
+      <div class="gate-name" style="color:var(--yellow-text);">No second-source on receivables</div>
+      <div class="gate-desc">Brand invoice &ldquo;paid&rdquo; status currently trusts Ghed&rsquo;s data entry. Wise has an API for incoming transfers too; future enhancement is to cross-reference the way we do for outgoing payments.</div>
+    </div>
+    <div class="gate" style="border-color:var(--yellow-text);">
+      <div class="gate-name" style="color:var(--yellow-text);">Wise reference must exist before close</div>
+      <div class="gate-desc">If Ghed marks a ClickUp task <strong>paid</strong> without pasting the Wise transfer reference, Skill 8 will fail verification for that student (no reference &rarr; can&rsquo;t lookup). This is by design &mdash; reference is mandatory.</div>
+    </div>
+    <div class="gate" style="border-color:var(--yellow-text);">
+      <div class="gate-name" style="color:var(--yellow-text);">April 2026 has no verification trail</div>
+      <div class="gate-desc">Period was auto-approved without running Skill 8. Wise references exist in ClickUp custom fields but were never written to <code>student_period_payouts</code>. Brand invoices marked verified with NULL payment data. Backfill plan in progress.</div>
+    </div>
+  </div>
+</div>
+
 <!-- COMPLETE FLOW -->
 <div class="section-divider">
   <h2>Complete Flow (with Financial Controls)</h2>
