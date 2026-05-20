@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Bounty Program — Everything You Need to Know</title>
+<style>
+  :root {
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-tertiary: #888;
+    --bg-primary: #fff;
+    --bg-secondary: #fafafa;
+    --border: #e0e0e0;
+    --accent: #00B894;
+    --accent-soft: rgba(0,184,148,0.10);
+    --warn: #b8860b;
+    --warn-soft: rgba(255,193,7,0.12);
+    --confirm-bg: rgba(255,193,7,0.18);
+    --confirm-text: #8a6d00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-primary: rgba(255,255,255,0.9);
+      --text-secondary: rgba(255,255,255,0.62);
+      --text-tertiary: rgba(255,255,255,0.42);
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #222;
+      --border: #333;
+      --accent-soft: rgba(0,184,148,0.14);
+      --warn: #e0b341;
+      --warn-soft: rgba(255,193,7,0.10);
+      --confirm-bg: rgba(255,193,7,0.16);
+      --confirm-text: #e0b341;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 56px 24px 96px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 30px; font-weight: 600; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .lede { color: var(--text-secondary); font-size: 17px; margin: 0 0 40px; }
+  h2 {
+    font-size: 22px; font-weight: 600; margin: 52px 0 16px;
+    padding-top: 16px; border-top: 1px solid var(--border); letter-spacing: -0.01em;
+    scroll-margin-top: 24px;
+  }
+  h3 { font-size: 17px; font-weight: 600; margin: 28px 0 10px; }
+  p { margin: 0 0 14px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0 0 16px; padding-left: 22px; }
+  li { margin: 4px 0; }
+  strong { font-weight: 600; }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.88em;
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-radius: 5px; padding: 1px 6px; color: var(--accent);
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 18px; font-size: 15px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-tertiary); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .pill { display: inline-block; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 600; }
+  .confirm { display: inline-block; background: var(--confirm-bg); color: var(--confirm-text); border-radius: 5px; padding: 0 6px; font-size: 12px; font-weight: 600; font-family: ui-monospace, "SF Mono", Menlo, monospace; vertical-align: middle; }
+  .callout {
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 8px; padding: 16px 18px; margin: 16px 0;
+  }
+  .callout.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .callout p:last-child { margin-bottom: 0; }
+  .quicklinks { display: grid; gap: 8px; margin: 0 0 8px; }
+  .quicklinks a {
+    display: block; padding: 14px 18px; background: var(--bg-secondary);
+    border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary);
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .quicklinks a:hover { border-color: var(--accent); transform: translateX(2px); text-decoration: none; }
+  .quicklinks .ql-name { font-weight: 600; }
+  .quicklinks .ql-desc { color: var(--text-tertiary); font-size: 14px; margin-top: 1px; }
+  .journey {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13.5px;
+    background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 18px; overflow-x: auto; line-height: 1.8; color: var(--text-secondary);
+  }
+  .status-dot { font-size: 13px; }
+  .footer { margin-top: 72px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 13px; }
+  .footer a { color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Ad Bounty Program — Everything You Need to Know</h1>
+  <p class="lede">This is your one-stop reference for the Ad Bounty program. Bookmark it. When you have a question, check here first.</p>
+
+  <h2 id="quick-links" style="border-top:none;padding-top:0;">Quick links</h2>
+  <div class="quicklinks">
+    <a href="https://tally.so/r/7RxaWR"><div class="ql-name">Apply to Ad Bounties →</div><div class="ql-desc">If you haven't yet</div></a>
+    <a href="#9-tracking-your-ads"><div class="ql-name"><code>/status</code> &amp; <code>/all-submissions</code></div><div class="ql-desc">Check your submissions right in Discord</div></a>
+    <a href="#need-help"><div class="ql-name">Open a support ticket <span class="confirm">[CONFIRM: support URL]</span></div><div class="ql-desc">If you can't find your answer here</div></a>
+  </div>
+
+  <h2 id="what-it-is">What the Ad Bounty program is</h2>
+  <p>You make ads for real ecommerce brands. Brands run those ads with their own money. If your ads get spend, you get paid <strong>3.5% of whatever the brand spends on them</strong>.</p>
+  <p>That's it. No upfront cost to the brand. No risk to you besides your time. Real budgets, real performance data, real money.</p>
+  <p>It's a win-win. Brands get more ads tested. You get paid to practice on actual brands.</p>
+
+  <h2 id="earn-beyond">What you can earn beyond payouts</h2>
+  <p>Two milestone rewards on top of your regular payouts:</p>
+  <ul>
+    <li>🏆 <strong>BountyHunter role</strong> — generate $10,000 in revenue across all brands <span class="confirm">[CONFIRM]</span></li>
+    <li>🚀 <strong>Free Evolve access</strong> — generate $100,000 in revenue in a single month, get one month of Evolve free</li>
+  </ul>
+  <p>Full details in <a href="#11-milestones-and-rewards">Milestones and rewards</a>.</p>
+
+  <h2 id="journey">The full journey at a glance</h2>
+  <div class="journey">Apply → Get approved → Enroll in brands → Submit ad → Tech QA → Brand QA →<br>Approved → Queued → Launched → Earning → Paid out</div>
+  <p>Below is what each step actually looks like and what to expect.</p>
+
+  <h2 id="1-applying">1. Applying to the program</h2>
+  <p>Find the <strong>#ad-bounty-info</strong> channel in Discord. There's a pinned message with a link to the Ad Bounty website.</p>
+  <p>On the site, click <strong>Start now</strong>. You'll fill out a short form with:</p>
+  <ul>
+    <li>Your full name</li>
+    <li>Your Discord username (so the bot can DM you)</li>
+    <li>Your Whop email</li>
+    <li>Your payment info</li>
+  </ul>
+  <p>For payouts we strongly recommend a <a href="https://wise.com">Wise account</a>. It's free, fast, and lets us run automated payouts. If you don't have one, you can still get paid through your local bank — it'll just be slower.</p>
+  <p>Once you submit the form, you'll get a DM from the <strong>Ecom Talent Bounty Bot</strong> confirming your application was received.</p>
+  <div class="callout warn">
+    <p><strong>⚠️ Check your Discord settings before applying</strong></p>
+    <p>The bot communicates with you entirely through DMs. If you have DMs disabled, the bot can't reach you — you won't get any updates about your application, approvals, revision requests, or payouts.</p>
+    <p>Before you apply, go to <strong>Discord Settings → Privacy &amp; Safety</strong> and make sure you allow direct messages from server members. Without this, the program won't work for you.</p>
+  </div>
+
+  <h2 id="2-getting-approved">2. Getting approved</h2>
+  <p>A team member reviews your application. When you're approved, you'll get a welcome DM that includes:</p>
+  <ul>
+    <li>Your unique <strong>Creator ID</strong> (this is how we track all your ads across all brands)</li>
+    <li>Links to enroll in any of the active brands</li>
+    <li>A link back to this page</li>
+  </ul>
+  <p>You don't need to memorize your Creator ID. It's auto-attached to everything you submit.</p>
+  <p>If something's wrong with your application, you'll get a DM explaining what to fix and how to re-apply.</p>
+
+  <h2 id="3-enrolling-in-brands">3. Enrolling in brands</h2>
+  <p>After approval, you'll see the list of brands currently on the program. Click the enrollment link for any brand you want to make ads for. You can enroll in as many as you want.</p>
+  <p>When you enroll, you'll get a DM that contains:</p>
+  <ul>
+    <li>Your <strong>unique submission link</strong> for that brand</li>
+    <li>A link to the <strong>brand brief</strong></li>
+    <li>A link to the <strong>#brand-name-chat</strong> channel where students discuss that brand</li>
+  </ul>
+  <p><strong>Pin the submission link DM.</strong> Right-click → Pin. You'll need that link every time you submit an ad for that brand. Don't share it with anyone — it's tied to you.</p>
+  <h3>Your performance dashboard</h3>
+  <p>Within ~48 hours of enrolling, the team also creates your <strong>personal performance dashboard</strong> for that brand. You'll get a separate DM when it's ready.</p>
+  <p>This dashboard is where you'll track how your ads are doing in real time. Once your ads are launched and start getting spend, they'll appear here automatically. You'll see:</p>
+  <ul>
+    <li>Total spend on your ads for this brand</li>
+    <li>Total revenue your ads generated</li>
+    <li>ROAS (return on ad spend)</li>
+    <li>Per-ad breakdown so you can see exactly which creative is winning</li>
+    <li>Date range filter (today, yesterday, last 7 days, custom)</li>
+  </ul>
+  <p>This is your single source of truth for performance. Use it to make data-driven decisions about what's working and what's not — then iterate based on what you see.</p>
+  <div class="callout">
+    <p><strong>Heads up:</strong> your ads only show up on the dashboard once they're actually launched and getting spend. If you just submitted something, give it time to make it through review and into the launch queue. Pin the dashboard DM too so you can find it easily.</p>
+  </div>
+
+  <h2 id="4-studying-the-brand">4. Studying the brand</h2>
+  <p>This is the step most people skip. Don't.</p>
+  <p>Open the brand brief. It contains everything you need:</p>
+  <ul>
+    <li><strong>Brand overview</strong> — who they are, hero product, positioning</li>
+    <li><strong>Target audience</strong> — the actual avatars they sell to</li>
+    <li><strong>Example ads</strong> — their current winners, what's working, why</li>
+    <li><strong>Resources</strong> — product photos, B-roll, fonts, brand guidelines</li>
+    <li><strong>Market research doc</strong> — deep customer research</li>
+  </ul>
+  <p>Spend at least an hour here before you make a single ad. Watch their current ads in the ad library. Read the market research. Drop into the brand chat in Discord and see what other students are discussing.</p>
+  <p>Some brands have specific design rules (e.g. static ad templates) — those will be flagged in the brief. Read those before you start.</p>
+  <p>The more you understand the brand before you start, the higher your chance of making something that wins.</p>
+
+  <h2 id="5-making-your-ad">5. Making your ad</h2>
+  <p>This is where you apply everything from the <strong>Creative Strategy</strong> section of the program. If you haven't watched it yet, watch it before you start making bounties. You'll get way more out of this if you do.</p>
+  <h3>Two hard rules (don't break these)</h3>
+  <div class="callout warn">
+    <p><strong>1. No sale-based ads.</strong> No "Black Friday," no "50% off," no "limited time" promotions. The whole point is to make ads that can run for months or years. Sale ads have a 1-week shelf life.</p>
+    <p><strong>2. No price mentions.</strong> Don't put the price of the product in your ad. Brands change their pricing. The moment your ad mentions a price that's no longer accurate, it gets shut off. That's bad for everyone.</p>
+    <p>If you break either rule, your ad won't get launched. You'll just have to redo it.</p>
+  </div>
+  <h3>Variations</h3>
+  <p>Submit at least <strong>3 variations</strong> of every ad. Same core ad, different hooks. This lets us test which hook lands best with the audience.</p>
+  <p>Don't go above 6 variations per submission. More than that just creates noise.</p>
+  <h3>File limits</h3>
+  <p>300MB per file max. Keep that in mind when exporting.</p>
+
+  <h2 id="6-submitting">6. Submitting your ad</h2>
+  <p>Open your unique submission link for the brand (the one you pinned). Drag and drop your files. Optionally add notes about your thinking or ad copy. Submit.</p>
+  <p>Within 30 seconds, the bot will DM you a <strong>submission confirmation</strong> with a unique submission ID. Save that ID somewhere if you ever need to reference this specific submission.</p>
+  <p>The submission then goes into the review queue.</p>
+
+  <h2 id="7-review">7. The review process</h2>
+  <p>Every submission goes through two automated stages: <strong>Tech QA</strong> and <strong>Brand QA</strong>.</p>
+  <h3>Tech QA</h3>
+  <p>Checks the technical quality of your ad. Things like:</p>
+  <ul>
+    <li>Image and video quality</li>
+    <li>Save zone compliance (text doesn't get cut off on mobile)</li>
+    <li>Typos</li>
+    <li>Meta ad policy compliance</li>
+    <li>General "is this runnable" stuff</li>
+  </ul>
+  <h3>Brand QA</h3>
+  <p>Checks if your ad respects the brand's specific rules. Every brand has different requirements — claims they can't make, products they can't show a certain way, language they need to avoid. Brand QA catches all of that.</p>
+  <p>We've made Brand QA strict on purpose. If anything's borderline, your ad gets flagged for <strong>manual review</strong> by a human, where someone on our team takes a closer look.</p>
+  <h3>Possible outcomes</h3>
+  <p>After QA, one of three things happens:</p>
+  <p><strong>Approved.</strong> Your ads passed everything and are queued to launch. You'll get a DM with personalized feedback on what's working and what could be even better.</p>
+  <p><strong>Manual review required.</strong> Something needs a human eye. This isn't necessarily a problem — sometimes the AI just wants a second opinion. A team member will review and either approve it or send you a revision request.</p>
+  <p><strong>Revision requested.</strong> Your ad needs changes before it can launch. The DM will include:</p>
+  <ul>
+    <li>Exactly what failed (Tech QA or Brand QA, with specific reasons)</li>
+    <li>Reviewer comments if a human added context</li>
+    <li>A unique resubmit link for that revision</li>
+  </ul>
+  <p>When you get a revision request, fix what was flagged, click the resubmit link, and re-upload. The revised version goes through QA again.</p>
+  <h3>How long does this take?</h3>
+  <p>Reviews are processed in a queue. We don't promise a specific turnaround — we work through ads as fast as we can. You can always check status with <code>/status</code> in Discord.</p>
+
+  <h2 id="8-launch">8. Launch</h2>
+  <p>When your ad is approved, it enters the <strong>launch queue</strong>. The queue is brand-specific because each brand has a daily ad spend capacity, which limits how many new ads we can launch per day.</p>
+  <p>Some brands can absorb 20 new batches a day. Some can only absorb 5. We launch in chronological order — no favorites, no jumping the line.</p>
+  <p>When your ad goes live, you'll get a DM letting you know. Your dashboard will start updating with performance data.</p>
+
+  <h2 id="9-tracking-your-ads">9. Tracking your ads</h2>
+  <p>You have two ways to check on your ads:</p>
+  <h3><code>/status</code> in Discord</h3>
+  <p>Run <code>/status</code> and you'll see all your active submissions across all brands, with current stage, time in stage, and a link to view each creative. Color-coded by status:</p>
+  <ul>
+    <li><span class="status-dot">🟢</span> <strong>Launched</strong> — live on Meta</li>
+    <li><span class="status-dot">🔵</span> <strong>In review / Ready to launch</strong> — in the queue</li>
+    <li><span class="status-dot">🟡</span> <strong>Revision requested</strong> — needs changes from you</li>
+  </ul>
+  <p>Run <code>/all-submissions</code> for your full history including killed and archived ads.</p>
+  <div class="callout">
+    <p><strong>Bot commands</strong> <span class="confirm">[stub — finalized with bot launch]</span></p>
+    <ul style="margin-bottom:0;">
+      <li><code>/status</code> — your active submissions, stage, time in stage, view links</li>
+      <li><code>/all-submissions</code> — full history (capped at 30 most recent), all statuses</li>
+      <li><code>/me</code> — your Creator ID, brands you're enrolled in, and brands available to join</li>
+    </ul>
+  </div>
+  <h3>Performance dashboards</h3>
+  <p>Your per-brand dashboards are where the actual numbers live. Open the dashboard for any brand you're enrolled in to see live performance of your ads (covered in detail in <a href="#3-enrolling-in-brands">section 3</a>).</p>
+  <h3>What the statuses mean</h3>
+  <ul>
+    <li><strong>Approved</strong> — passed QA, in the queue</li>
+    <li><strong>Ready to launch</strong> — ad account setup is done, going live next</li>
+    <li><strong>Launched</strong> — live on Meta and being tested</li>
+    <li><strong>Learning</strong> — in Meta's learning phase (still optimizing)</li>
+    <li><strong>Killed</strong> — removed from rotation (didn't perform, or replaced)</li>
+  </ul>
+  <p>A killed ad isn't a punishment — it just means the brand decided to free up budget for other ads. You still get paid for any spend that happened while it was live.</p>
+
+  <h2 id="10-getting-paid">10. Getting paid</h2>
+  <h3>How payouts work</h3>
+  <p>You get paid <strong>3.5% of every dollar a brand spends on your ads</strong>. Flat rate, no tiers.</p>
+  <table>
+    <thead><tr><th>Brand spend on your ads</th><th>Your payout</th></tr></thead>
+    <tbody>
+      <tr><td>$5,000</td><td>$175</td></tr>
+      <tr><td>$20,000</td><td>$700</td></tr>
+      <tr><td>$50,000</td><td>$1,750</td></tr>
+      <tr><td>$100,000</td><td>$3,500</td></tr>
+    </tbody>
+  </table>
+  <p>These aren't theoretical numbers. Brands on the program regularly spend $100k+ per month, and some have spent that on a single creator's ads.</p>
+  <h3>Payout schedule</h3>
+  <p>Payouts happen <strong>monthly</strong>. All your earnings across all brands get aggregated into a single payment, so you don't get a million tiny payouts.</p>
+  <p>When a payout is processed, you'll get a DM with the full breakdown — which brand, which creative, how much it spent, what your cut was.</p>
+  <h3>How payments are sent</h3>
+  <p>If you have a Wise account, payouts are automated. Money lands in your account.</p>
+  <p>If you don't have Wise, payouts go through your local bank, which is slower but still works.</p>
+
+  <h2 id="11-milestones-and-rewards">11. Milestones and rewards</h2>
+  <p>On top of payouts, there are two milestones that unlock extra rewards:</p>
+  <h3>🏆 BountyHunter role — $10,000 in generated revenue <span class="confirm">[CONFIRM]</span></h3>
+  <p>When your ads have generated $10k in cumulative revenue across all brands, you get the <strong>BountyHunter</strong> role in Discord. Your name turns green, and you unlock additional perks. <span class="confirm">[CONFIRM with Karlo: lifetime or single-month? what specific perks?]</span></p>
+  <h3>🚀 Free Evolve access — $100,000 in generated revenue in a single month</h3>
+  <p>When your ads generate $100k in revenue <strong>within a single month</strong>, you get <strong>free access to Evolve</strong> for the following month. Evolve is our scaling program for ecommerce brand owners ($1.5k/month normally). Course access only, no community access.</p>
+  <p>This is renewable, but you have to re-earn it every month. If you generate $100k in May, you get Evolve access for June. To keep access in July, you need to hit $100k again in June. The moment you stop hitting the threshold, your Evolve access pauses.</p>
+  <p>In short: keep submitting, keep hitting $100k/month, keep your access.</p>
+
+  <h2 id="rules">The rules (a quick reference)</h2>
+  <ol>
+    <li><strong>No sale-based ads.</strong> No discounts, no Black Friday, no "limited time."</li>
+    <li><strong>No price mentions in ads.</strong> Prices change, your ad shouldn't.</li>
+    <li><strong>Minimum 3 variations per submission.</strong> Max 6.</li>
+    <li><strong>Don't share your unique submission link.</strong> It's tied to you.</li>
+    <li><strong>300MB max per file.</strong></li>
+    <li><strong>Read the brand brief before you make ads.</strong> Every brand has its own rules.</li>
+    <li><strong>Keep Discord DMs enabled.</strong> Without them, the bot can't reach you.</li>
+  </ol>
+
+  <h2 id="faq">FAQ</h2>
+  <p><strong>How long does the review process take?</strong><br>We don't promise a specific time. Reviews go through a queue. Run <code>/status</code> to see where your submission is.</p>
+  <p><strong>Why is my ad still in manual review?</strong><br>Manual review means a human is taking a closer look. It happens by design when our QA system isn't 100% sure. It's not a bad sign — sometimes ads just need a second opinion.</p>
+  <p><strong>My ad got launched but isn't getting any spend. Why?</strong><br>Meta's algorithm decides how to spend campaign budget across all the ads in the campaign. If your ad isn't getting spend, it usually means Meta thinks it's not relevant to anyone. Likely culprits: weak hook, unclear visual, no audience signal in the first 3 seconds. Take a look at the ad and figure out what could be improved, then make a new variation.</p>
+  <p><strong>My ad was performing then suddenly died. What happened?</strong><br>Your ad probably exhausted its warm audience. The fix is usually to make the ad more emotional and broaden the appeal so it can scale to colder audiences.</p>
+  <p><strong>Do I get paid for ads that don't perform?</strong><br>You get paid 3.5% of whatever the brand spends on your ads. If your ads get $0 in spend, you get $0. The brand only pays you when your ads actually run.</p>
+  <p><strong>Can I submit ads to multiple brands at once?</strong><br>Yes. Enroll in as many brands as you want. Just make sure each ad goes through that brand's specific submission link.</p>
+  <p><strong>What happens if my ad gets killed?</strong><br>You still get paid for any spend that happened while it was live. Killed just means the brand stopped running it — usually because it was no longer profitable or they're rotating in newer ads.</p>
+  <p><strong>Can I see what other students are doing for a brand?</strong><br>Yes — check the brand-specific Discord channel (e.g. <strong>#dog-friendly-co</strong>). Students share tips, ideas, and sometimes their own ads.</p>
+  <p><strong>I disabled DMs in Discord. Will I miss notifications?</strong><br>Yes, and it'll break the program for you. The bot communicates with you entirely through DMs. If they're off, you won't get application updates, approvals, revision requests, or payout notifications. Re-enable them in Discord Settings → Privacy &amp; Safety.</p>
+  <p><strong>My first few ads aren't winning. Am I doing something wrong?</strong><br>No. Most ads don't win on the first try — this is normal even for experienced creators. The point is to keep submitting, get feedback, learn from each one, and improve. The students who win consistently are the ones who put in reps.</p>
+
+  <h2 id="need-help">Need help?</h2>
+  <ul>
+    <li>Check <code>/status</code> first — most "where is my ad" questions are answered there</li>
+    <li>Ask in <strong>#bounty-chat</strong> — other students or the team often respond fast</li>
+    <li>Open a support ticket as a last resort <span class="confirm">[CONFIRM: support URL]</span></li>
+  </ul>
+  <p>That's everything. Now go make some ads.</p>
+
+  <div class="footer">
+    Ecom Talent Bounty Program — living reference, updated whenever the program changes.
+  </div>
+
+</div>
+</body>
+</html>
