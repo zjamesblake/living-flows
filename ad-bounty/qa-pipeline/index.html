@@ -296,7 +296,7 @@
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Karlo clicks Approve button on a ClickUp task (status: <code>manual review</code> or <code>revision requested</code>)</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Karlo clicks Approve button on a ClickUp task (status: <code>manual review</code> or <code>requested revision</code>)</div></div>
     <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.1: <strong>Derive Override Reason</strong> from QA results (which gates flagged) → <strong>Set Approved</strong> in Supabase (<code>final_status='approved'</code>, <code>override_decision='approved'</code>, <code>override_reason=&lt;derived&gt;</code>, <code>reviewed_at=NOW()</code>, <code>approved_at=NOW()</code>) → Set Status: Approved in ClickUp → Comment: FP Captured.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp (button) → n8n → Supabase → ClickUp → (Bucket B / FP)</div></div>
