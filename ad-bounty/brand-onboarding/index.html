@@ -685,8 +685,8 @@
   </div>
   <div class="step-details">
     <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand owner in server with role (Step 21)</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Sequence matters — do in this order:<br>1. Karlo creates brand chat channel in Discord<br>2. Karlo confirms channel is ready<br>3. Zak sets brand status → active + activated_at in Supabase<br>4. Zak manually triggers BLA workflow from n8n → students notified about new brand with enrollment link</div></div>
-    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo (channel) → Zak (Supabase activation)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Sequence matters — do in this order:<br>1. Karlo creates brand chat channel in Discord<br>2. Karlo confirms channel is ready<br>3. Zak sets brand status → active + activated_at in Supabase<br>4. Zak manually triggers BLA workflow from n8n → students notified about new brand with enrollment link<br>5. Karlo announces the brand in the community<br>6. Karlo intros the brand owner in their channel</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo (channel, announce, intro) → Zak (Supabase activation + BLA trigger)</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord + Supabase + n8n (BLA workflow)</div></div>
     <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand channel live, brand status = active, students notified and can enroll</div></div>
     <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 23</div></div>
