@@ -132,6 +132,23 @@
   .n-teal .step-num { background: var(--teal-bg); color: var(--teal); }
   .n-amber .step-num { background: var(--amber-bg); color: var(--amber); }
   .n-blue .step-num { background: var(--blue-bg); color: var(--blue); }
+
+  .callout { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 24px; background: var(--bg-secondary); }
+  .callout-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .callout-header .tag { font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: var(--purple-bg); color: var(--purple); }
+  .callout p { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 8px; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout code { font-size: 12px; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 3px; color: var(--text-primary); }
+  .callout ul { margin: 6px 0 8px 18px; }
+  .callout li { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 3px; }
+
+  .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .ref { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: var(--bg-primary); }
+  .ref-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .ref-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .ref a { color: var(--blue); text-decoration: none; }
+  .ref a:hover { text-decoration: underline; }
+  @media (max-width: 600px) { .ref-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -139,11 +156,11 @@
 
 <div class="header">
   <h1>Ad Bounty — QA Pipeline Flow</h1>
-  <p>Creative QA journey from student submission through AI evaluation to approval or revision. Every step shows trigger, action, owner, system, output, and handoff. Click any step to expand details.</p>
+  <p>Creative QA journey from student submission through AI evaluation, brand-owner review, grading, launch, and post-launch sync. Supabase is the source of truth for state; ClickUp is the operator UI. Click any step to expand details.</p>
   <div class="meta">
-    <span>Version 1.1 — May 2026 (verified)</span>
-    <span>7 steps across 5 phases</span>
-    <span>7 workflows · 7 QA gates</span>
+    <span>Version 2.0 — May 2026</span>
+    <span>7 phases + Integrity Layer</span>
+    <span>10 workflows · 7 QA gates</span>
   </div>
 </div>
 
@@ -154,198 +171,311 @@
   <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Student</div>
 </div>
 
+<!-- INTEGRITY LAYER CALLOUT -->
+<div class="callout">
+  <div class="callout-header"><span class="tag">Integrity Layer</span> Supabase-as-Source</div>
+  <p>Every state change writes <strong>Supabase first</strong>, then mirrors to ClickUp. The State Transition Guard (workflow G) watches every ClickUp status change — if ClickUp drifts from Supabase, the guard reverts ClickUp and posts a comment explaining why.</p>
+  <p><strong>Operator rule:</strong> never set ClickUp status manually. Always click the buttons (Approve, Request Revisions, Ready to Launch, Winner, Loser). Manual drags get reverted by the guard.</p>
+  <p>Trigger-coupled workflows (5.0 Grading, 6.0 Ready to Launch) also <strong>bail on bypass</strong> — they read Supabase first and skip side-effects if state doesn't match expected, so a manual drag-and-revert leaves no DMs/comments behind.</p>
+</div>
+
 <!-- QA GATES REFERENCE -->
 <div class="gate-section">
   <h2>QA Gates</h2>
   <div class="gate-grid">
-    <div class="gate"><div class="gate-name">T1 Visual Quality</div><div class="gate-desc">Image clarity, design integrity</div></div>
-    <div class="gate"><div class="gate-name">B1 Brand Voice</div><div class="gate-desc">Tone, language alignment</div></div>
-    <div class="gate"><div class="gate-name">T2 Spatial Analysis</div><div class="gate-desc">Format compliance, safe zones</div></div>
-    <div class="gate"><div class="gate-name">B2 Visual Brand</div><div class="gate-desc">Colors, style consistency</div></div>
-    <div class="gate"><div class="gate-name">T3 Compliance</div><div class="gate-desc">Text accuracy, Meta policies, pricing</div></div>
-    <div class="gate"><div class="gate-name">B3 Claims</div><div class="gate-desc">Accuracy, restrictions</div></div>
-    <div class="gate" style="grid-column: 2"><div class="gate-name">B4 Guidelines</div><div class="gate-desc">Brand-specific rules</div></div>
+    <div class="gate"><div class="gate-name">T1 Quality</div><div class="gate-desc">Image clarity, design integrity</div></div>
+    <div class="gate"><div class="gate-name">B1 Claims</div><div class="gate-desc">Accuracy, restrictions, substantiation</div></div>
+    <div class="gate"><div class="gate-name">T2 Design</div><div class="gate-desc">Composition, safe zones, spatial layout</div></div>
+    <div class="gate"><div class="gate-name">B2 Niche</div><div class="gate-desc">Audience fit, voice, visual brand</div></div>
+    <div class="gate"><div class="gate-name">T3 Format</div><div class="gate-desc">Aspect, text density, Meta format rules</div></div>
+    <div class="gate"><div class="gate-name">B3 Guidelines</div><div class="gate-desc">Brand-specific rules</div></div>
+    <div class="gate" style="grid-column: 2"><div class="gate-name">B4 Safety</div><div class="gate-desc">Meta policy + restricted content checks</div></div>
   </div>
 </div>
 
 <!-- PHASE 1 — Submission Capture -->
 <div class="phase">
-<div class="phase-label">Phase 1 — Submission Capture</div>
+<div class="phase-label">Phase 1 — Submission Capture (1.0v2)</div>
 
 <div class="step n-purple" onclick="toggle(this)">
   <div class="step-header">
     <div class="step-num">1</div>
     <div class="step-info">
       <div class="step-title">Student submits creative</div>
-      <div class="step-subtitle">Tally form → validates creator + brand → uploads to Drive → creates ClickUp task</div>
-      <div class="step-badges"><span class="badge badge-owner">Student</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">Tally → n8n → Drive → ClickUp → Supabase</span></div>
+      <div class="step-subtitle">Tally form → validates creator + brand → uploads to Drive → creates ClickUp task → inserts Supabase row</div>
+      <div class="step-badges"><span class="badge badge-owner">Student</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">Tally → n8n → Supabase → Drive → ClickUp → Discord</span></div>
     </div>
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student submits via universal form (tally.so/r/9qQYk1) — pre-filled with creator_id + brand_id from their enrollment link</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">1.0v2 workflow: validates creator_id (approved?) → validates brand_id (active?) → uploads files to Google Drive with standardized naming → creates ClickUp task in brand's list → writes submission to Supabase → sends confirmation DM</div></div>
-    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Student (submits) → System (1.0v2 workflow)</div></div>
-    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Supabase → Google Drive → ClickUp → Discord</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">ClickUp task (status: "Technical QA"), Supabase submission record, files in Drive with standardized names, confirmation DM to student. #ops-digest notification.</div></div>
-    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Task status "Technical QA" triggers Step 2</div></div>
-    <div class="note note-info">File naming: {BrandName} - Ad Bounty - {CreatorName} - {CreatorID} - {TaskID} - {Variation}.{ext}</div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student submits via universal form (<code>tally.so/r/9qQYk1</code>) — pre-filled with creator_id + brand_id from their enrollment link</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">1.0v2 workflow: validates creator (approved?) → validates brand (active?) → uploads files to Drive with standardized naming → <strong>Insert Submission</strong> in Supabase (status: <code>technical_qa</code>) → creates ClickUp task in brand's list (status: <code>technical qa</code>) → DM: Submission Received</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Student (submits) → System (1.0v2)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Supabase → Drive → ClickUp → Discord</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Supabase submission row; ClickUp task; files in Drive; confirmation DM; #ops-digest entry.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">ClickUp status <code>technical qa</code> → triggers 2.0v2 (Step 2)</div></div>
+    <div class="note note-info">File naming: <code>{BrandName} - Ad Bounty - {CreatorName} - {CreatorID} - {TaskID} - {Variation}.{ext}</code></div>
   </div>
 </div>
 </div>
 
 <!-- PHASE 2 — Technical QA -->
 <div class="phase">
-<div class="phase-label">Phase 2 — Technical QA</div>
+<div class="phase-label">Phase 2 — Technical QA (2.0v2)</div>
 
 <div class="step n-teal" onclick="toggle(this)">
   <div class="step-header">
     <div class="step-num">2</div>
     <div class="step-info">
       <div class="step-title">Technical QA evaluation (T1–T3)</div>
-      <div class="step-subtitle">Gemini evaluates visual quality, spatial compliance, and Meta policy adherence</div>
-      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Gemini → Supabase</span></div>
+      <div class="step-subtitle">Gemini evaluates Quality, Design, and Format</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Gemini → Supabase → ClickUp</span></div>
     </div>
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp task status = "technical qa"</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">2.0v2 workflow: reads T1–T3 prompts from Supabase → sends creative to Gemini 2.5 Pro (3 parallel API calls for images to prevent lens-switching; 1 call for video via File API) → writes pass/fail results to Supabase</div></div>
-    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (2.0v2 workflow)</div></div>
-    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (prompts) → Gemini 2.5 Pro API → Supabase (results) → ClickUp (status update)</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">T1–T3 pass/fail results written to submission record. ClickUp task status advances.</div></div>
-    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All 3 pass → "brand qa" (Step 3). Any fail → revision flow (Step 4a).</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp status = <code>technical qa</code></div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">2.0v2: reads T1–T3 prompts from Supabase → 3 parallel Gemini 2.5 Pro calls for images (1 call for video via File API) → <strong>Patch QA Results</strong> in Supabase → advance ClickUp status</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (2.0v2)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (prompts) → Gemini → Supabase (results) → ClickUp</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">T1–T3 pass/fail recorded; ClickUp status advances.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All 3 pass → <code>brand qa</code> (Step 3). Any fail → manual review (Step 3a override path).</div></div>
     <div class="branch-grid">
       <div class="branch branch-success"><strong>All T1–T3 pass</strong><br>→ Brand QA (Step 3)</div>
-      <div class="branch branch-fail"><strong>Any gate fails</strong><br>→ Revision Request (Step 4a)</div>
+      <div class="branch branch-fail"><strong>Any gate fails</strong><br>→ Manual review queue</div>
     </div>
-    <div class="note note-resolved">Why 3 parallel calls for images: prevents "lens-switching" confusion in the model. Each gate evaluates independently with its own context. Videos use 1 call via File API (required for files >20MB).</div>
+    <div class="note note-resolved">Why 3 parallel calls for images: prevents lens-switching confusion. Each gate evaluates independently. Video uses 1 call (File API required for &gt;20MB).</div>
   </div>
 </div>
 </div>
 
 <!-- PHASE 3 — Brand QA -->
 <div class="phase">
-<div class="phase-label">Phase 3 — Brand QA</div>
+<div class="phase-label">Phase 3 — Brand QA (3.0v2)</div>
 
 <div class="step n-teal" onclick="toggle(this)">
   <div class="step-header">
     <div class="step-num">3</div>
     <div class="step-info">
       <div class="step-title">Brand QA evaluation (B1–B4)</div>
-      <div class="step-subtitle">Gemini evaluates brand voice, visual identity, claims, and brand-specific guidelines</div>
-      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Gemini → Supabase</span></div>
+      <div class="step-subtitle">Gemini evaluates Claims, Niche, Guidelines, Safety. On fail → writes <code>manual_review</code> directly to Supabase (sets the manual_review_at timestamp).</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Gemini → Supabase → ClickUp</span></div>
     </div>
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp task status = "brand qa"</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">3.0v2 workflow: reads B1–B4 prompts from Supabase (brand-specific, generated during onboarding) → sends creative to Gemini 2.5 Pro → writes pass/fail results to Supabase</div></div>
-    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (3.0v2 workflow)</div></div>
-    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (brand prompts) → Gemini 2.5 Pro API → Supabase (results) → ClickUp (status update)</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">B1–B4 pass/fail results written to submission record. ClickUp task status advances.</div></div>
-    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All 4 pass → "approved" (Step 5). Any fail → revision flow (Step 4a).</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp status = <code>brand qa</code></div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">3.0v2: reads B1–B4 prompts (brand-specific, from onboarding) → Gemini 2.5 Pro → <strong>Patch QA Results</strong>. On fail: <strong>Set Manual Review</strong> (<code>final_status='manual_review'</code> + <code>manual_review_at=NOW()</code> + clears <code>approved_at</code>/<code>reviewed_at</code>) → Set Status: Manual Review in ClickUp.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (3.0v2)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (brand prompts) → Gemini → Supabase (results + manual_review write) → ClickUp</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">B1–B4 results recorded; Supabase status set on fail; ClickUp status advances.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All 4 pass → <code>approved</code> (skips to grading, Step 5). Any fail → Brand Owner Review (Phase 4).</div></div>
     <div class="branch-grid">
       <div class="branch branch-success"><strong>All B1–B4 pass</strong><br>→ Grading (Step 5)</div>
-      <div class="branch branch-fail"><strong>Any gate fails</strong><br>→ Revision Request (Step 4a)</div>
+      <div class="branch branch-fail"><strong>Any gate fails</strong><br>→ Brand Owner Review (Phase 4)</div>
     </div>
-    <div class="note note-info">Brand prompts are generated via Claude interview + Gemini during brand onboarding. Each brand has 5 prompts: B1–B4 + brand_interpretation guide. Managed by Zak in Supabase.</div>
+    <div class="note note-resolved">Decision #78 — manual_review timestamp is set by 3.0v2 (the workflow that creates the bucket), not downstream. This anchors the QA feedback loop's bucket math.</div>
+    <div class="note note-info">Brand prompts: Claude interview + Gemini, refined during onboarding. Each brand has B1–B4 + brand_interpretation. Owned by Zak in Supabase.</div>
   </div>
 </div>
 </div>
 
-<!-- PHASE 4 — Revision Flow -->
+<!-- PHASE 4 — Brand Owner Review -->
 <div class="phase">
-<div class="phase-label">Phase 4 — Revision Flow</div>
+<div class="phase-label">Phase 4 — Brand Owner Review (4.1 / 4.2 / 4.3)</div>
 
-<div class="step n-teal" onclick="toggle(this)">
+<!-- 4a Approve -->
+<div class="step n-amber" onclick="toggle(this)">
   <div class="step-header">
     <div class="step-num">4a</div>
     <div class="step-info">
-      <div class="step-title">Revision request sent</div>
-      <div class="step-subtitle">Student receives specific feedback via Discord DM — which gates failed and what to fix</div>
-      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Discord</span></div>
+      <div class="step-title">Approve (button) — 4.1</div>
+      <div class="step-subtitle">Karlo clicks "Approve" on a manual-review task → captures FP override → routes to grading</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">ClickUp → n8n → Supabase → ClickUp → Discord</span></div>
     </div>
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Technical QA or Brand QA failure (any gate fails)</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.2 workflow: builds feedback message from QA results → sends Discord DM to student with specific issues (which gates failed, what to fix)</div></div>
-    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (4.2 workflow)</div></div>
-    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Discord (student DM)</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Student has actionable feedback via Discord DM. ClickUp task status = "Revision Requested."</div></div>
-    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Student revises creative and re-submits → Step 4c</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Karlo clicks Approve button on a ClickUp task (status: <code>manual review</code> or <code>revision requested</code>)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.1: <strong>Derive Override Reason</strong> from QA results (which gates flagged) → <strong>Set Approved</strong> in Supabase (<code>final_status='approved'</code>, <code>override_decision='approved'</code>, <code>override_reason=&lt;derived&gt;</code>, <code>reviewed_at=NOW()</code>, <code>approved_at=NOW()</code>) → Set Status: Approved in ClickUp → Comment: FP Captured.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp (button) → n8n → Supabase → ClickUp → (Bucket B / FP)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Supabase row in Bucket B (approved-over-flag / FP) with override_reason populated. ClickUp status = <code>approved</code>.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">ClickUp status <code>approved</code> → triggers 5.0v2 (Phase 5)</div></div>
+    <div class="note note-info">FP capture lives in 4.1 (not 5.0) because 4.1 is the button. Override_reason is derived from QA results, not entered by Karlo — keeps the click cost flat.</div>
   </div>
 </div>
 
 <div class="arrow">↓</div>
 
+<!-- 4b Request Revisions -->
 <div class="step n-amber" onclick="toggle(this)">
   <div class="step-header">
     <div class="step-num">4b</div>
     <div class="step-info">
-      <div class="step-title">Manual approval override</div>
-      <div class="step-subtitle">Karlo overrides QA for edge cases — creative is correct but gates disagree</div>
-      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">n8n → ClickUp → Supabase</span></div>
+      <div class="step-title">Request Revisions (button) — 4.2</div>
+      <div class="step-subtitle">Two branches based on origin: TP (was flagged) or FN (auto-passed then pulled back)</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">ClickUp → n8n → Supabase → ClickUp → Discord</span></div>
     </div>
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Karlo decides a submission should be approved despite QA failure</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Karlo manually triggers 4.1 workflow for the specific submission. Bypasses QA results, marks submission as approved.</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Karlo clicks Request Revisions on a ClickUp task</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.2: <strong>Determine Origin &amp; Validate</strong> (reads current Supabase state + reviewer-feedback field). Then branches:<br>• <strong>TP branch</strong> (task came from manual_review): <strong>Set Revision</strong> (<code>final_status='revision_requested'</code>, <code>reviewed_at=NOW()</code>, clears any stale <code>override_decision</code>/<code>override_reason</code>) → Set Status: Revision Requested → DM: Revision Requested → Comment: Revision Sent.<br>• <strong>FN branch</strong> (task was auto-approved, now pulled back): <strong>Set Revision</strong> (<code>override_decision='revision_requested'</code>, <code>override_reason=&lt;reviewer note&gt;</code>, clears <code>approved_at</code>/<code>ready_to_launch_at</code>) → Set Status: Revision Requested → DM: Revision Requested → Comment: FN Captured.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
-    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n (4.1 workflow) → ClickUp + Supabase</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Submission status = approved. Skips directly to grading (Step 5).</div></div>
-    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 5 (Grading)</div></div>
-    <div class="note note-decision">Use sparingly — only for edge cases where the creative is clearly correct but the AI gates disagree. Override rate is tracked as a KPI.</div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp (button) → n8n → Supabase → ClickUp → Discord</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Bucket C (TP / confirmed revision) or FN row (auto-pass corrected). Student notified. Reviewer feedback persisted.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Student receives DM → revises → re-submits via 4.3 (Step 4c)</div></div>
+    <div class="note note-resolved">FN sensor: any task auto-passed by 3.0v2 (no manual_review_at) that later gets Request Revisions → flagged as False Negative. Drives the loosen-prompts side of QA calibration.</div>
   </div>
 </div>
 
 <div class="arrow">↓</div>
 
+<!-- 4c Re-submission -->
 <div class="step n-purple" onclick="toggle(this)">
   <div class="step-header">
     <div class="step-num">4c</div>
     <div class="step-info">
-      <div class="step-title">Re-submission</div>
+      <div class="step-title">Re-submission — 4.3</div>
       <div class="step-subtitle">Student submits revised creative → old files archived → full QA re-run</div>
       <div class="step-badges"><span class="badge badge-owner">Student</span><span class="badge badge-auto">→ Automated</span><span class="badge badge-system">Tally → n8n → Supabase → Drive → ClickUp</span></div>
     </div>
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student submits revised creative via Tally form (link provided in the revision feedback DM)</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.3 workflow: marks old Supabase submission records as "resubmitted" → archives old files in Drive → uploads new files with standardized naming → creates new Supabase submission records → re-enters QA flow at Phase 2 (Technical QA)</div></div>
-    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Student (re-submits) → System (4.3 workflow)</div></div>
-    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Supabase → Google Drive → ClickUp</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Old submission records marked "resubmitted" (excluded from dashboard counts). Old files archived in Drive. New files uploaded + new submission records created. Submission re-enters Technical QA.</div></div>
-    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Phase 2 (Technical QA) — full pipeline re-run from Step 2</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student submits revised creative via Tally (link from revision DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.3: <strong>Patch Old Submissions</strong> (<code>final_status='resubmitted'</code>) → archives old Drive files → uploads new files with standardized naming → <strong>Insert Submission</strong> (new Supabase row, status <code>technical_qa</code>) → re-enters Phase 2.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Student → System (4.3)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Supabase → Drive → ClickUp</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Old rows marked <code>resubmitted</code> (excluded from dashboards). New rows in Technical QA.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Phase 2 (Technical QA) — full pipeline re-run</div></div>
   </div>
 </div>
 </div>
 
-<!-- PHASE 5 — Grading + Notification -->
+<!-- PHASE 5 — Grading -->
 <div class="phase">
-<div class="phase-label">Phase 5 — Grading + Notification</div>
+<div class="phase-label">Phase 5 — Grading (5.0v2)</div>
 
 <div class="step n-teal" onclick="toggle(this)">
   <div class="step-header">
     <div class="step-num">5</div>
     <div class="step-info">
-      <div class="step-title">Grade and notify</div>
-      <div class="step-subtitle">Gemini grades the creative → media buyer + student notified via Discord</div>
-      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Gemini → Supabase → Discord</span></div>
+      <div class="step-title">Grade approved creative</div>
+      <div class="step-subtitle">Bail-on-bypass guard → Gemini grades → DM to creator + media buyer notification</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">n8n → Supabase → Gemini → Discord</span></div>
     </div>
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp task status = "approved"</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">5.0v2 workflow: reads grading prompt from Supabase → sends creative to Gemini → writes grade to submission record → sends Discord DM to media buyer (creative ready to launch) + Discord DM to student (approved + grade)</div></div>
-    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (5.0v2 workflow)</div></div>
-    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (grading prompt) → Gemini 2.5 Pro → Supabase (grade) → Discord (media buyer DM + student DM)</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Submission graded in Supabase. Media buyer notified (can launch ad). Student notified (creative approved + grade).</div></div>
-    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Media buyer launches creative on Meta. Creative enters Ad Lifecycle tracking (Daily Creative Matching → Spend Pull → Payouts).</div></div>
-    <div class="note note-resolved">This is the end of the QA pipeline. What happens next is tracked in the Ad Lifecycle & Payouts process — creative matching, spend tracking, and student payouts.</div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp status changes to <code>approved</code> (fires from both 4.1 approve and manual drags — guard handles both)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">5.0v2: <strong>Fetch Supabase State</strong> → <strong>Expected State?</strong> (is <code>final_status='approved'</code>?) → if no, Comment: Bypass Detected and bail. If yes, proceed: Gemini grading → <strong>Patch Grade</strong> in Supabase → DM: Approved &amp; Graded (creator) → Comment: Grade Posted.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (5.0v2)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase → Gemini → Supabase → Discord</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Grade written to Supabase. Creator DM sent. (Media buyer launch DM lives on the Ready-to-Launch step.)</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Operator clicks Ready to Launch when the creative is queued for Meta → triggers 6.0 RTL (Phase 6).</div></div>
+    <div class="note note-resolved">Bail-on-bypass: a manual drag to "approved" without 4.1's PATCH leaves Supabase in non-approved state. 5.0 reads Supabase first; if state doesn't match, it skips grading and DMs — guard (workflow G) then reverts the ClickUp status.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 6 — Ready to Launch -->
+<div class="phase">
+<div class="phase-label">Phase 6 — Ready to Launch (6.0 RTL)</div>
+
+<div class="step n-amber" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">6</div>
+    <div class="step-info">
+      <div class="step-title">Mark Ready to Launch (button) — 6.0</div>
+      <div class="step-subtitle">Karlo clicks "Ready to Launch" → bail-on-bypass guard → Supabase set → media buyer notified</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Karlo</span><span class="badge badge-system">ClickUp → n8n → Supabase → ClickUp → Discord</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Karlo clicks Ready to Launch button on a graded task</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">6.0 RTL: <strong>Fetch Supabase State</strong> → <strong>Expected State?</strong> (is <code>final_status='approved'</code>?) → if no, Comment: Bypass Detected and bail. If yes: <strong>Set Ready to Launch</strong> in Supabase (<code>final_status='ready_to_launch'</code>, <code>ready_to_launch_at=NOW()</code>) → Set Status: Ready to Launch in ClickUp → DM: Ready to Launch (media buyer) → Comment: RTL Notified.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp (button) → n8n → Supabase → ClickUp → Discord</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Supabase status = <code>ready_to_launch</code>. Media buyer DM with launch context. Operator handoff complete.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Media buyer launches on Meta. Creative enters Ad Lifecycle (Creative Matching → Spend Pull → Payouts).</div></div>
+    <div class="note note-info">Why a dedicated workflow: keeps the operator UI consistent (one button per state change) and lets us drop the media-buyer DM here instead of cluttering Phase 5.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 7 — Post-Launch Sync -->
+<div class="phase">
+<div class="phase-label">Phase 7 — Post-Launch Sync (7.0)</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">7</div>
+    <div class="step-info">
+      <div class="step-title">Learning / Complete / Winner / Loser sync</div>
+      <div class="step-subtitle">ClickUp status-change → 7.0 mirrors to Supabase + stamps the matching timestamp</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">ClickUp → n8n → Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp status changes to one of: <code>learning</code>, <code>complete</code>, <code>winner</code>, <code>loser</code></div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">7.0: <strong>Patch Status Sync</strong> in Supabase — sets <code>final_status</code> + the corresponding timestamp (<code>learning_at</code> / <code>complete_at</code> / etc.). Sends no DMs (Phase 7 is internal bookkeeping).</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (7.0)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp → n8n → Supabase</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Supabase mirrors ClickUp lifecycle state. Dashboard queries (status_group, etc.) reflect current reality.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Brand-management reporting reads from Supabase. No further system action.</div></div>
+    <div class="note note-info">Narrowed in May 2026 to only handle post-RTL states. Earlier states (manual_review, approved, ready_to_launch) are owned by their dedicated workflows (3.0v2, 4.1, 6.0 RTL).</div>
+  </div>
+</div>
+</div>
+
+<!-- STATE TRANSITION GUARD (G) -->
+<div class="phase">
+<div class="phase-label">Integrity Layer — State Transition Guard (G)</div>
+
+<div class="step n-gray" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">G</div>
+    <div class="step-info">
+      <div class="step-title">State Transition Guard</div>
+      <div class="step-subtitle">Watches every ClickUp status change → reverts drifts from Supabase</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">ClickUp → n8n → Supabase → ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Any ClickUp status change on a QA-pipeline task</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">G: <strong>Fetch Supabase State</strong> → compares ClickUp status to <code>final_status</code> in Supabase. If they match, exit. If they don't, <strong>Set Status (revert)</strong> in ClickUp back to the Supabase-derived state → Comment: Guard Reverted with explanation.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (G)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp → n8n → Supabase → ClickUp</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">ClickUp re-aligned to Supabase. Operator sees an explanatory comment on the task.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">None — guard is terminal. Operator must use the button to make the state change actually happen.</div></div>
+    <div class="note note-resolved">Why this exists: ClickUp triggers fire on manual drags. Without a guard, a drag-to-approved would send DMs, post grade comments, and corrupt timestamps. The guard makes Supabase the unambiguous source of truth.</div>
+  </div>
+</div>
+</div>
+
+<!-- WRITE STANDARDS -->
+<div class="phase">
+<div class="phase-label">External-System Write Standards</div>
+<div class="callout">
+  <div class="callout-header"><span class="tag">Spec</span> Every write across the pipeline follows one of four templates</div>
+  <p>Every Supabase write, ClickUp status set, ClickUp comment, and Discord DM in the QA pipeline conforms to a canonical template — same auth, same headers, same body shape, same naming. Debugging any write is a five-second read.</p>
+  <ul>
+    <li><strong>Supabase:</strong> hardcoded service-role JWT, four headers in fixed order (apikey, Authorization, Content-Type, <code>Prefer: return=minimal</code>), state-guard idempotency filter, body keys alphabetized with explicit nulls.</li>
+    <li><strong>ClickUp status:</strong> lowercase status strings, written <em>after</em> Supabase, retry on fail (max 2, 2s wait), naming <code>Set Status: &lt;Name&gt;</code>.</li>
+    <li><strong>ClickUp comment:</strong> three sources (catalog / code-composed / static-transient), no user tags, naming <code>Comment: &lt;Intent&gt;</code>.</li>
+    <li><strong>Discord DM:</strong> canonical embed schema, 4-color palette (green/yellow/red/blue), naming <code>DM: &lt;Intent&gt;</code>.</li>
+  </ul>
+  <div class="ref-grid">
+    <div class="ref"><div class="ref-title"><a href="reference/external_write_standards.md">external_write_standards.md</a></div><div class="ref-desc">Overview, naming conventions, bail-on-bypass pattern</div></div>
+    <div class="ref"><div class="ref-title"><a href="reference/supabase_write_template.md">supabase_write_template.md</a></div><div class="ref-desc">PATCH / INSERT / GET variants</div></div>
+    <div class="ref"><div class="ref-title"><a href="reference/clickup_status_set_template.md">clickup_status_set_template.md</a></div><div class="ref-desc">Status node template + retry policy</div></div>
+    <div class="ref"><div class="ref-title"><a href="reference/clickup_comment_template.md">clickup_comment_template.md</a></div><div class="ref-desc">Comment sources + naming</div></div>
+    <div class="ref" style="grid-column: 1 / span 2"><div class="ref-title"><a href="reference/discord_dm_template.md">discord_dm_template.md</a></div><div class="ref-desc">Embed schema, color palette, per-workflow context fields</div></div>
   </div>
 </div>
 </div>
@@ -356,27 +486,29 @@
 
 <div class="quality-card">
   <h3>1. What breaks?</h3>
-  <div class="quality-item"><strong>1.0v2 fails on submission (Step 1):</strong> No ClickUp task, no confirmation DM. Signal: #ops-digest silence. Student can re-submit — duplicate handling is safe.</div>
-  <div class="quality-item"><strong>2.0v2 or 3.0v2 Gemini call fails (Steps 2–3):</strong> Submission stuck in "technical qa" or "brand qa" status. No bad data written. Check n8n logs, re-trigger the workflow.</div>
-  <div class="quality-item"><strong>4.2 revision DM fails (Step 4a):</strong> Student doesn't know what to fix. Task shows "Revision Requested" but no DM received. Karlo can manually relay feedback from the ClickUp task.</div>
-  <div class="quality-item"><strong>5.0v2 grading fails (Step 5):</strong> Submission approved but ungraded. Media buyer not notified. Re-trigger 5.0v2.</div>
-  <div class="quality-item"><strong>Duplicate submission (same files):</strong> Each gets its own QA run. Not deduplicated — acceptable at current volume.</div>
+  <div class="quality-item"><strong>1.0v2 fails on submission:</strong> No ClickUp task, no DM. Signal: #ops-digest silence. Student can re-submit safely.</div>
+  <div class="quality-item"><strong>2.0v2 / 3.0v2 Gemini call fails:</strong> Task stuck in <code>technical qa</code> / <code>brand qa</code>. No bad data written (return=minimal + idempotency filter). Re-trigger from n8n.</div>
+  <div class="quality-item"><strong>4.2 DM fails:</strong> Student doesn't know what to fix. Comment on task still posts; Karlo can relay via ClickUp.</div>
+  <div class="quality-item"><strong>5.0 grading fails after guard pass:</strong> Approved but ungraded. Creator DM not sent. Re-trigger 5.0.</div>
+  <div class="quality-item"><strong>6.0 RTL DM fails:</strong> Media buyer not notified but Supabase state correct. Re-trigger or notify manually.</div>
+  <div class="quality-item"><strong>7.0 post-launch sync fails:</strong> ClickUp lifecycle moves but Supabase lags. Dashboards drift until guard catches it or 7.0 re-runs.</div>
+  <div class="quality-item"><strong>Guard (G) down:</strong> Manual drags would corrupt state. Mitigation: train operators that buttons are the only path; drags = no-op.</div>
 </div>
 
 <div class="quality-card">
   <h3>2. Who knows?</h3>
-  <div class="quality-item"><strong>All workflow completions post to #ops-digest.</strong> Silence = failure. Check n8n execution logs.</div>
-  <div class="quality-item"><strong>QA results visible on ClickUp task + Ops Dashboard.</strong> Per-gate pass rates tracked per brand.</div>
-  <div class="quality-item"><strong>Karlo sees all submissions in ClickUp</strong> and can spot stuck items (tasks sitting in a status too long).</div>
-  <div class="quality-item"><strong>Override rate tracked on Ops Dashboard.</strong> High override rate for a brand = prompts need adjustment.</div>
+  <div class="quality-item"><strong>#ops-digest</strong> is the heartbeat — silence on a workflow = failure. Check n8n executions.</div>
+  <div class="quality-item"><strong>QA results + override_decision</strong> visible on ClickUp tasks and Ops Dashboard. Per-gate precision + FN% tracked in the monthly calibration digest.</div>
+  <div class="quality-item"><strong>Guard reverts</strong> post a Comment: Guard Reverted on the task — operator sees the explanation immediately.</div>
+  <div class="quality-item"><strong>Bail-on-bypass</strong> events post a Comment: Bypass Detected — auditable trail of skipped side-effects.</div>
 </div>
 
 <div class="quality-card">
   <h3>3. What's the fallback?</h3>
-  <div class="quality-item"><strong>Any workflow down:</strong> Karlo can manually approve via 4.1 as an interim measure. QA results still in ClickUp + Supabase once workflows resume.</div>
-  <div class="quality-item"><strong>Gemini API down:</strong> All QA pauses. No bad data written. Resume when API returns — submissions stay in their current status.</div>
-  <div class="quality-item"><strong>Discord bot down:</strong> DMs delayed but QA pipeline keeps running. All results still recorded in ClickUp + Supabase. Karlo can relay feedback manually.</div>
-  <div class="quality-item"><strong>QA gates miscalibrated for a brand:</strong> Zak adjusts prompts in Supabase. Re-run affected submissions. Max 2 adjustment rounds — if still off, re-do brand interview.</div>
+  <div class="quality-item"><strong>Any workflow down:</strong> Supabase remains the source of truth. State can be hand-set via SQL; ClickUp catches up when the guard or 7.0 next runs.</div>
+  <div class="quality-item"><strong>Gemini API down:</strong> All QA pauses. No bad data — submissions sit in their current Supabase state. Resume on API return.</div>
+  <div class="quality-item"><strong>Discord bot down:</strong> DMs delayed; pipeline keeps running. All results still recorded in Supabase + ClickUp comments. Karlo can relay manually.</div>
+  <div class="quality-item"><strong>QA gates miscalibrated:</strong> Monthly calibration digest (per-gate precision, FN-pattern) feeds prompt adjustments. Max 2 rounds → re-do brand interview if still off.</div>
 </div>
 
 </div>
