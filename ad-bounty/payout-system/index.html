@@ -580,9 +580,9 @@
         <td>For every <code>brand_invoices</code> row: status must be <code>paid</code> or <code>verified</code>, <code>payment_amount</code> must be set, and <code>|payment_amount &minus; invoice_amount| &le; $0.50</code>. Any miss &rarr; period stays open. <span style="color:var(--purple)">(Amount-match check added 2026-05-18.)</span></td>
       </tr>
       <tr>
-        <td><strong>Adjustments</strong><br><span style="color:var(--text-tertiary); font-size:11px;">Every change documented + reversible</span></td>
-        <td><code>/payout-adjust</code> + audit_log</td>
-        <td>Dashboard cannot edit payout amounts &mdash; only <code>/payout-adjust</code> can. Each adjustment writes an additive row in <code>payout_adjustments</code> (original amount preserved on <code>original_payout_usd</code>) and an <code>audit_log</code> entry. Delta payment auto-creates a new ClickUp task for Ghed.</td>
+        <td><strong>Adjustments</strong><br><span style="color:var(--text-tertiary); font-size:11px;">Every top-up has its own ledger entry + verified Wise transfer</span></td>
+        <td><code>/payout-adjust</code> + option B webhook routing</td>
+        <td>The ONLY way to change payouts. Two types: <code>recalc</code> (calc changed &mdash; updates SPP.total_payout_usd, preserves original_payout_usd as baseline) and <code>payment_correction</code> (calc was right, payment short &mdash; SPP unchanged, top-up only). Each adjustment becomes a <code>payout_adjustments</code> row + a <code>[ADJUSTMENT]</code> ClickUp task tagged with the <code>Adjustment ID</code> custom field. The n8n webhook reads that field, fetches <code>payout_adjustments</code> instead of <code>student_period_payouts</code>, and verifies the Wise transfer against the row&rsquo;s <code>difference</code>. Each adjustment has its own status/wise_* lifecycle independent of the SPP row.</td>
       </tr>
       <tr>
         <td><strong>Visibility</strong><br><span style="color:var(--text-tertiary); font-size:11px;">Anyone can see current state without asking</span></td>
