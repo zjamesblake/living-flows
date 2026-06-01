@@ -448,25 +448,84 @@
 </div>
 </div>
 
-<!-- PROPOSED 3 -->
+<!-- ADJUSTMENT WORKFLOW (LIVE as of 2026-06-01) -->
 <div class="phase">
-<div class="phase-label">Addition 3 &mdash; Adjustment Audit Trail</div>
+<div class="phase-label">Adjustment Workflow &mdash; Option B (LIVE 2026-06-01)</div>
 
 <div class="step n-purple" onclick="toggle(this)">
   <div class="step-header">
-    <div class="step-num">&#9733;</div>
+    <div class="step-num">A1</div>
     <div class="step-info">
-      <div class="step-title">Tracked, approved payment adjustments</div>
-      <div class="step-subtitle">Every change logged: original amount, adjusted amount, reason, who requested, who approved</div>
-      <div class="step-badges"><span class="badge badge-new">NEW</span><span class="badge badge-owner">Lovro &rarr; Zak</span><span class="badge badge-auto">/payout-adjust</span></div>
+      <div class="step-title">Issue surfaces &mdash; student support ticket OR internal QA finding</div>
+      <div class="step-subtitle">Student reports "my ad XYZ wasn't included" / "my payment was short" &mdash; or QA spots a calc discrepancy</div>
+      <div class="step-badges"><span class="badge badge-owner">Astrid / Lovro</span><span class="badge badge-system">Discord / Support Inbox</span></div>
     </div>
     <div class="expand-icon">&#9662;</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Table</div><div class="detail-value">payout_adjustments: original_amount, adjusted_amount, reason, support_ticket_ref, requested_by, approved_by, applied_at</div></div>
-    <div class="detail-row"><div class="detail-label">Flow</div><div class="detail-value">Student reports missing ad &rarr; Lovro verifies in ad account &rarr; creates adjustment request &rarr; Zak approves &rarr; /payout-adjust applies + logs + creates ClickUp task for additional payment</div></div>
-    <div class="detail-row"><div class="detail-label">Rule</div><div class="detail-value">Original values are NEVER overwritten &mdash; adjustments are additive records. Full history preserved.</div></div>
-    <div class="note note-new">April had 3 adjustments ($140 total) done by direct DB edits with no trail. This formalizes the process.</div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student DM, support ticket, or internal QA observation</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Astrid/Lovro verifies the claim &mdash; checks the ad account, confirms attribution, computes the correct number</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Documented case with: student name, period, adjustment type, expected difference, reason, optional support ticket reference</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Hands documented case to Zak for approval</div></div>
+    <div class="note note-info">For volume &gt;5/month, build a Tally/ClickUp intake form. Until then, triage inside the originating support ticket is fine.</div>
+  </div>
+</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">A2</div>
+    <div class="step-info">
+      <div class="step-title">Zak runs <code>/payout-adjust</code></div>
+      <div class="step-subtitle">Two types: <code>recalc</code> (calc changed) or <code>payment_correction</code> (calc was right, payment was short)</div>
+      <div class="step-badges"><span class="badge badge-owner">Zak</span><span class="badge badge-auto">/payout-adjust</span><span class="badge badge-system">Supabase + ClickUp</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Command</div><div class="detail-value"><code>python3 scripts/adjust_payout.py [recalc|payment_correction] &lt;spp_id&gt; &lt;amount&gt; "&lt;reason&gt;" [--ticket REF]</code></div></div>
+    <div class="detail-row"><div class="detail-label">recalc</div><div class="detail-value">Calc changed (missing ad attribution, brand spend correction, etc.). <code>amount</code> = the new SPP total. SPP.total_payout_usd is updated; original_payout_usd preserved as baseline.</div></div>
+    <div class="detail-row"><div class="detail-label">payment_correction</div><div class="detail-value">Calc was right; Wise payment was short due to keying error. <code>amount</code> = what was actually sent. SPP unchanged. Difference = top-up owed.</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">(1) New <code>payout_adjustments</code> row with status=<code>approved</code>, <code>adjustment_type</code>, <code>original_amount</code>, <code>adjusted_amount</code>, <code>difference</code>, <code>reason</code>, <code>support_ticket_ref</code>. (2) New <code>[ADJUSTMENT]</code> ClickUp task on Payout Review list with the <code>Adjustment ID</code> custom field pre-populated.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Ghed sees the task in his queue alongside regular [WISE] tasks</div></div>
+  </div>
+</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">A3</div>
+    <div class="step-info">
+      <div class="step-title">Ghed sends the difference via Wise</div>
+      <div class="step-subtitle">Same flow as regular [WISE] payment &mdash; send, paste reference, mark <code>paid</code></div>
+      <div class="step-badges"><span class="badge badge-owner">Ghed</span><span class="badge badge-system">Wise + ClickUp</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value"><code>[ADJUSTMENT]</code> task appears in Payout Review list with full SOP in description</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Send the <code>difference</code> amount via Wise to the student&rsquo;s Wise email. Reference: <code>Ecomtalent - Ad Bounty Adjustment</code>. Paste the transfer reference into the Payment Reference custom field. Move status to <code>paid</code>.</div></div>
+    <div class="detail-row"><div class="detail-label">DM</div><div class="detail-value">After paying, DM the student via Discord with the SOP-provided message ("we found a small $X shortfall&hellip; just sent the missing amount via Wise")</div></div>
+    <div class="detail-row"><div class="detail-label">If failure</div><div class="detail-value">Set status to <code>failed</code> or <code>needs info</code> and tag Astrid. Astrid liaises with student to fix details, hands back to Ghed for re-send.</div></div>
+  </div>
+</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">A4</div>
+    <div class="step-info">
+      <div class="step-title">n8n webhook verifies the adjustment (option B routing)</div>
+      <div class="step-subtitle">Reads <code>Adjustment ID</code> &rarr; verifies against <code>payout_adjustments.difference</code> &rarr; updates the adjustment row</div>
+      <div class="step-badges"><span class="badge badge-auto">n8n: Y2Io1DBXUqAcLjmU</span><span class="badge badge-system">Wise API + Supabase</span></div>
+    </div>
+    <div class="expand-icon">&#9662;</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp Automation fires on status change to <code>paid</code> &rarr; webhook POST with task ID</div></div>
+    <div class="detail-row"><div class="detail-label">Routing</div><div class="detail-value"><strong>Parse Task</strong> detects <code>[ADJUSTMENT]</code> prefix, extracts the <code>Adjustment ID</code> custom field, sets <code>is_adjustment=true</code></div></div>
+    <div class="detail-row"><div class="detail-label">Fetch</div><div class="detail-value"><strong>Supabase GET Adjustment</strong> reads the <code>payout_adjustments</code> row by ID. (For non-adjustment tasks, <strong>Supabase GET Payout</strong> reads the SPP row instead &mdash; both run in parallel; Wise Decide picks the right one.)</div></div>
+    <div class="detail-row"><div class="detail-label">A2 verify</div><div class="detail-value"><strong>Wise Get Quote</strong> + <strong>Wise Decide</strong> compares <code>quote.sourceAmount</code> (what Ghed entered) vs <code>payout_adjustments.difference</code>. Tolerance: $1 absolute or 2% relative.</div></div>
+    <div class="detail-row"><div class="detail-label">Write</div><div class="detail-value"><strong>Supabase PATCH</strong> writes to <code>payout_adjustments</code>: <code>status</code> (verified/flagged), <code>wise_transfer_id</code>, <code>wise_amount_sent</code>, <code>wise_status</code>, <code>wise_verified_at</code>, <code>paid_at</code>. SPP row untouched.</div></div>
+    <div class="detail-row"><div class="detail-label">Comment</div><div class="detail-value">Posts result back to the ClickUp task as a comment (Verified / Flagged with reason)</div></div>
+    <div class="note note-info">Option B = each adjustment has its own verification lifecycle independent of the SPP row. One student can have multiple adjustments in the same period; each verifies independently.</div>
   </div>
 </div>
 </div>
