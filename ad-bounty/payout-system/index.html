@@ -147,9 +147,10 @@
 <!-- ROLES -->
 <div class="role-grid">
   <div class="role"><div class="role-name">Zak</div><div class="role-desc">Runs skills, reviews outputs, approves payouts and adjustments</div></div>
-  <div class="role"><div class="role-name">Ghed</div><div class="role-desc">Creates Atria snapshots, sends Wise payments, applies Whop promo codes, confirms brand payments received, maintains student payment info</div></div>
+  <div class="role"><div class="role-name">Ghed</div><div class="role-desc">Sends Wise payments (&ge;$10), Whop dashboard payments (&lt;$10), confirms brand payments received, maintains student payment info. Tags Astrid on failed/needs-info tasks.</div></div>
   <div class="role"><div class="role-name">Angie</div><div class="role-desc">Invoices brands based on spend totals, marks invoices sent in dashboard</div></div>
-  <div class="role"><div class="role-name">Lovro</div><div class="role-desc">Fields student support tickets, verifies adjustment claims</div></div>
+  <div class="role"><div class="role-name">Astrid</div><div class="role-desc">Liaises with students on failed/incomplete payment info. Triggered when Ghed sets a task to <code>failed</code> or <code>needs info</code>. Collects/corrects info, hands back to Ghed for re-send.</div></div>
+  <div class="role"><div class="role-name">Lovro</div><div class="role-desc">Fields student support tickets that turn into adjustment claims. Verifies the underlying ad/calc data, hands documented case to Zak for <code>/payout-adjust</code>.</div></div>
 </div>
 
 <!-- RESPONSIBILITIES BY PHASE -->
