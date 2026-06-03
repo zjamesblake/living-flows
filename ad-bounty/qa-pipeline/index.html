@@ -266,16 +266,17 @@
   </div>
   <div class="step-details">
     <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp status = <code>brand qa</code></div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">3.0v2: reads B1–B4 prompts (brand-specific, from onboarding) → Gemini 2.5 Pro → <strong>Patch QA Results</strong>. On fail: <strong>Set Manual Review</strong> (<code>final_status='manual_review'</code> + <code>manual_review_at=NOW()</code> + clears <code>approved_at</code>/<code>reviewed_at</code>) → Set Status: Manual Review in ClickUp.</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">3.0v2: reads B1–B4 prompts (brand-specific, from onboarding) → loops over files → Gemini 2.5 Pro → <strong>Patch QA Results</strong> per file. After loop completes: <strong>Fetch Just-QA'd Rows</strong> from Supabase (executeOnce) → <strong>Build Summary</strong> (cleanAllResults v5.0). On fail: <strong>Set Manual Review</strong> (<code>final_status='manual_review'</code> + <code>manual_review_at=NOW()</code> + clears <code>approved_at</code>/<code>reviewed_at</code>) → Set Status: Manual Review in ClickUp.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (3.0v2)</div></div>
-    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (brand prompts) → Gemini → Supabase (results + manual_review write) → ClickUp</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">B1–B4 results recorded; Supabase status set on fail; ClickUp status advances.</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (brand prompts) → Gemini → Supabase (results + aggregate fetch + manual_review write) → ClickUp</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">B1–B4 results recorded per file; ClickUp comment summarizes the batch with correct counts; Supabase status set on fail; ClickUp status advances.</div></div>
     <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All 4 pass → <code>approved</code> (skips to grading, Step 5). Any fail → Brand Owner Review (Phase 4).</div></div>
     <div class="branch-grid">
       <div class="branch branch-success"><strong>All B1–B4 pass</strong><br>→ Grading (Step 5)</div>
       <div class="branch branch-fail"><strong>Any gate fails</strong><br>→ Brand Owner Review (Phase 4)</div>
     </div>
     <div class="note note-resolved">Decision #78 — manual_review timestamp is set by 3.0v2 (the workflow that creates the bucket), not downstream. This anchors the QA feedback loop's bucket math.</div>
+    <div class="note note-resolved">2026-06-03 (PRD: resubmission-integrity Bug 3 fix): Brand QA summary now reads from Supabase via Fetch Just-QA'd Rows (executeOnce) — symmetric to the 2.0v2 fix. Same root cause + same fix pattern.</div>
     <div class="note note-info">Brand prompts: Claude interview + Gemini, refined during onboarding. Each brand has B1–B4 + brand_interpretation. Owned by Zak in Supabase.</div>
   </div>
 </div>
