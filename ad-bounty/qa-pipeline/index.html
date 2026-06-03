@@ -346,12 +346,13 @@
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student submits revised creative via Tally (link from revision DM)</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.3: <strong>Patch Old Submissions</strong> (<code>final_status='resubmitted'</code>) → archives old Drive files → uploads new files with standardized naming → <strong>Insert Submission</strong> (new Supabase row, status <code>technical_qa</code>) → re-enters Phase 2.</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Student submits revised creative via Tally form <code>vGreg4</code> (link from revision DM)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">4.3: <strong>Dedup Check</strong> (queries <code>submissions WHERE clickup_task_id=? AND tally_submission_id=?</code>) → if any row found, <strong>Already Processed?</strong> → exit silently (Tally retry caught — no side effects). Otherwise: <strong>Patch Old Submissions</strong> (<code>final_status='resubmitted'</code>) → archives old Drive files → uploads new files with standardized naming → <strong>Insert Submission</strong> (new Supabase row + <code>tally_submission_id</code> populated, status <code>technical_qa</code>) → re-enters Phase 2.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Student → System (4.3)</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Tally → n8n → Supabase → Drive → ClickUp</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Old rows marked <code>resubmitted</code> (excluded from dashboards). New rows in Technical QA.</div></div>
-    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Phase 2 (Technical QA) — full pipeline re-run</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Old rows marked <code>resubmitted</code> (excluded from dashboards). New rows in Technical QA, each tagged with the Tally <code>submissionId</code> that produced them.</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Phase 2 (Technical QA) — full pipeline re-run. (Tally retry of the same submission → exits at Dedup Check; no re-run.)</div></div>
+    <div class="note note-resolved">2026-06-02 (PRD: resubmission-integrity, Bug 1 + Bug 2 fixes): added <code>tally_submission_id</code> column to <code>submissions</code> + dedup gate at top of 4.3. Reason: Tally has a hard 10-second webhook timeout but 4.3 takes ~30s — Tally always retries, which previously created duplicate row sets and duplicate Drive ops. Dedup gate makes 4.3 idempotent on Tally <code>submissionId</code>. Also fixed the silent PGRST204 on Patch Old (missing <code>specifyBody:"json"</code>) that was leaving old rows at <code>revision_requested</code>. See system_contracts.md → Idempotency Patterns (Pattern B).</div>
   </div>
 </div>
 </div>
