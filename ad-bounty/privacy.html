@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Ad Bounty System</title>
+<style>
+  :root {
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-tertiary: #888;
+    --bg-primary: #fff;
+    --bg-secondary: #fafafa;
+    --border: #e0e0e0;
+    --accent: #00B894;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-primary: rgba(255,255,255,0.9);
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-tertiary: rgba(255,255,255,0.4);
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #222;
+      --border: #333;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 60px 24px;
+    line-height: 1.65;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 28px; font-weight: 600; margin: 0 0 8px; }
+  .subtitle { color: var(--text-secondary); margin-bottom: 48px; font-size: 15px; }
+  h2 { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin: 40px 0 16px; }
+  p { margin: 0 0 16px; color: var(--text-secondary); }
+  ul { margin: 0 0 16px; padding-left: 20px; color: var(--text-secondary); }
+  li { margin-bottom: 8px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .meta { font-size: 13px; color: var(--text-tertiary); border-top: 1px solid var(--border); padding-top: 24px; margin-top: 48px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Privacy Policy</h1>
+<p class="subtitle">Ad Bounty System — Meta App</p>
+
+<h2>About this policy</h2>
+<p>
+  This privacy policy describes how the <strong>Ad Bounty System</strong> Meta app
+  (the &ldquo;App&rdquo;) collects, uses, stores, and discloses information when
+  operated by Easy A Media (&ldquo;we&rdquo;, &ldquo;us&rdquo;, the &ldquo;Operator&rdquo;)
+  on behalf of partner brands.
+</p>
+<p>
+  The App is an internal-use, server-to-server integration that operates the
+  Ad Bounty creator program. It is not consumer-facing and does not present a
+  login surface to end users. It accesses Meta Marketing API data on behalf of
+  partner brands that have explicitly granted access to the Operator&rsquo;s
+  Business Manager via Meta Business Manager partner sharing.
+</p>
+
+<h2>Who we are</h2>
+<p>
+  <strong>Operator:</strong> Easy A Media (Meta Business Manager: Media A Easy,
+  ID 152562646477468)<br>
+  <strong>Contact:</strong>
+  <a href="mailto:zak@reversescaling.com">zak@reversescaling.com</a>
+</p>
+
+<h2>What information the App accesses</h2>
+<p>
+  The App accesses the following data from Meta on behalf of partner brand
+  ad accounts that have explicitly shared access with the Operator:
+</p>
+<ul>
+  <li><strong>Ad account metadata:</strong> account ID, name, currency, status, business owner.</li>
+  <li><strong>Ads, ad creatives, ad sets, campaigns:</strong> IDs, names, statuses, configuration.</li>
+  <li><strong>Creative assets:</strong> video IDs, image hashes, and the creative files uploaded by the App.</li>
+  <li><strong>Insights data:</strong> aggregate performance metrics (spend, impressions, clicks, conversions) at the ad level.</li>
+  <li><strong>Page metadata:</strong> Page ID and name where ads are posted &ldquo;as&rdquo; the brand Page.</li>
+</ul>
+<p>
+  The App does <strong>not</strong> collect personal data from end users of the
+  partner brands&rsquo; ads (consumers who see or click the ads). The App does
+  not collect data from individuals beyond what is necessary to operate
+  the partner brand&rsquo;s Meta advertising assets.
+</p>
+
+<h2>How we use the information</h2>
+<p>
+  Data accessed via the Meta Marketing API is used solely to:
+</p>
+<ul>
+  <li>Upload approved creative assets from the Ad Bounty creator program into the partner brand&rsquo;s Meta ad account.</li>
+  <li>Associate creator submissions with the resulting Meta ad objects (ad IDs, creative IDs) for performance reporting.</li>
+  <li>Read aggregate ad performance to calculate creator payouts and produce performance reports for the partner brand.</li>
+  <li>Maintain operational records for audit, debugging, and reconciliation.</li>
+</ul>
+<p>
+  We do <strong>not</strong> sell, rent, or share partner brand data with third parties.
+  We do not use partner brand data for targeting, profiling, or any purpose
+  outside the operation of the Ad Bounty program for that brand.
+</p>
+
+<h2>How we store and retain information</h2>
+<p>
+  Information accessed via Meta is stored in a private Supabase Postgres
+  database operated by Easy A Media. Access is restricted to authorized
+  Operator staff and the App&rsquo;s server-side processes. Data is retained for
+  the duration of the partner brand&rsquo;s engagement with the Ad Bounty program,
+  plus a reasonable archival period for financial reconciliation
+  (typically 12&ndash;24 months after engagement end).
+</p>
+<p>
+  Partner brands may request deletion of their stored data at any time by
+  contacting us at the address above.
+</p>
+
+<h2>How we share information</h2>
+<p>
+  We share data only with:
+</p>
+<ul>
+  <li><strong>Meta Platforms</strong>, via the Marketing API, in the normal course of operating the partner brand&rsquo;s ad account.</li>
+  <li><strong>Sub-processors</strong> we use to operate the App: Supabase (database hosting), Railway (application hosting), Google (Drive API for creative file access).</li>
+  <li><strong>The partner brand themselves</strong>, when delivering operational reports.</li>
+</ul>
+<p>
+  We do not share data with any other party without the partner brand&rsquo;s
+  explicit instruction.
+</p>
+
+<h2>Partner brand rights</h2>
+<p>
+  Partner brands whose Meta assets the App accesses may at any time:
+</p>
+<ul>
+  <li>Revoke the App&rsquo;s access via their own Meta Business Manager (Business Settings &rarr; Ad Accounts &rarr; Assigned Partners).</li>
+  <li>Request a copy of data we hold relating to their ad account by emailing us.</li>
+  <li>Request deletion of their data from our systems by emailing us.</li>
+</ul>
+
+<h2>Security</h2>
+<p>
+  Access tokens, service-account credentials, and database connection
+  details are stored as encrypted environment variables in our hosting
+  infrastructure. The App uses Meta System User tokens and signs requests
+  with <code>appsecret_proof</code> to verify server-side origin. We follow
+  standard practices for rotating credentials and limiting access on a
+  least-privilege basis.
+</p>
+
+<h2>Children</h2>
+<p>
+  The App is a B2B operational tool and is not intended for use by
+  individuals under 18. We do not knowingly collect data from children.
+</p>
+
+<h2>Changes to this policy</h2>
+<p>
+  We may update this policy from time to time. Updates will be posted at this
+  URL with a revised &ldquo;Last updated&rdquo; date below.
+</p>
+
+<h2>Contact</h2>
+<p>
+  Questions about this policy or about data we hold can be sent to
+  <a href="mailto:zak@reversescaling.com">zak@reversescaling.com</a>.
+</p>
+
+<div class="meta">
+  Last updated: 2026-06-03<br>
+  Applies to: Ad Bounty System Meta app (App ID 1948840529318450)
+</div>
+
+</div>
+</body>
+</html>
