@@ -685,12 +685,13 @@
   </div>
   <div class="step-details">
     <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand owner in server with role (Step 21)</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Sequence matters — do in this order:<br>1. Karlo creates brand chat channel in Discord<br>2. Karlo confirms channel is ready<br>3. Zak sets brand status → active + activated_at in Supabase<br>4. Zak manually triggers BLA workflow from n8n → students notified about new brand with enrollment link<br>5. Karlo announces the brand in the community<br>6. Karlo intros the brand owner in their channel</div></div>
-    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo (channel, announce, intro) → Zak (Supabase activation + BLA trigger)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Sequence matters — do in this order:<br>1. Karlo creates brand chat channel in Discord<br>2. Karlo copies the channel ID (right-click → Copy Channel ID, Developer Mode on) and sends to Zak<br>3. Karlo confirms channel is ready<br>4. Zak sets brand status → active + activated_at + <strong>discord_chat_channel_id</strong> in Supabase (same PATCH call)<br>5. Zak manually triggers BLA workflow from n8n → students notified about new brand with enrollment link<br>6. Karlo announces the brand in the community<br>7. Karlo intros the brand owner in their channel</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Karlo (channel, channel-ID capture, announce, intro) → Zak (Supabase activation + BLA trigger)</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Discord + Supabase + n8n (BLA workflow)</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand channel live, brand status = active, students notified and can enroll</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Brand channel live, brand status = active, channel ID stored, students notified and can enroll</div></div>
     <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 23</div></div>
-    <div class="note note-decision">Critical sequence: Channel MUST exist before BLA is triggered. Zak confirms all 3 prerequisites (channel ready, status=active, prompts active) before manually triggering BLA. BLA is NOT automatic — it requires intentional human trigger.</div>
+    <div class="note note-decision">Critical sequence: Channel MUST exist before BLA is triggered. Zak confirms all 4 prerequisites (channel ready, channel_id captured, status=active, prompts active) before manually triggering BLA. BLA is NOT automatic — it requires intentional human trigger.</div>
+    <div class="note note-decision">discord_chat_channel_id is consumed by the Brand Queue Status Broadcast workflow (Boundary 25, Mon/Fri Queue Pulse). Without it, the brand is silently skipped from the broadcast — non-NULL is a precondition for go-live.</div>
   </div>
 </div>
 
