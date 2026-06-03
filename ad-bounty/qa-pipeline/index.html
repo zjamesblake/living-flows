@@ -450,13 +450,14 @@
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Any ClickUp status change on a QA-pipeline task</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">G: <strong>Fetch Supabase State</strong> → compares ClickUp status to <code>final_status</code> in Supabase. If they match, exit. If they don't, <strong>Set Status (revert)</strong> in ClickUp back to the Supabase-derived state → Comment: Guard Reverted with explanation.</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp status change into a decision lane: <code>manual review</code>, <code>approved</code>, <code>requested revision</code>, or <code>ready to launch</code></div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">G: <strong>Fetch Supabase State</strong> — queries ALL active rows for the task (<code>final_status NOT IN (resubmitted, archived)</code> ordered by <code>submitted_at DESC</code>) → <strong>Compare &amp; Decide</strong> aggregates: if all active rows share one <code>final_status</code>, that's canonical; if mixed → noop (can't determine intent); if ClickUp matches canonical → noop; if mismatch → <strong>Set Status (revert)</strong> in ClickUp back to the Supabase-derived state → Comment: Guard Reverted with explanation.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (G)</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp → n8n → Supabase → ClickUp</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">ClickUp re-aligned to Supabase. Operator sees an explanatory comment on the task.</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">ClickUp re-aligned to Supabase (or noop on match / mixed state). Operator sees an explanatory comment on revert.</div></div>
     <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">None — guard is terminal. Operator must use the button to make the state change actually happen.</div></div>
     <div class="note note-resolved">Why this exists: ClickUp triggers fire on manual drags. Without a guard, a drag-to-approved would send DMs, post grade comments, and corrupt timestamps. The guard makes Supabase the unambiguous source of truth.</div>
+    <div class="note note-resolved">2026-06-02 (PRD: resubmission-integrity, decision #90): query semantic updated from "LIMIT 1 with no ORDER BY" (arbitrary row, caused spurious reverts) to "aggregate of all active rows" (deterministic; noops on mixed state). Earlier behavior surfaced as the incident on task 86ba79km9 — Postgres returned a stale <code>revision_requested</code> row and reverted a legitimate <code>approved</code> change.</div>
   </div>
 </div>
 </div>
