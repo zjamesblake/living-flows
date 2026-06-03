@@ -235,16 +235,17 @@
   </div>
   <div class="step-details">
     <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp status = <code>technical qa</code></div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">2.0v2: reads T1–T3 prompts from Supabase → 3 parallel Gemini 2.5 Pro calls for images (1 call for video via File API) → <strong>Patch QA Results</strong> in Supabase → advance ClickUp status</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">2.0v2: reads T1–T3 prompts from Supabase → loops over files → 3 parallel Gemini 2.5 Pro calls for images (1 call for video via File API) → <strong>Patch QA Results</strong> per file in Supabase. After loop completes: <strong>Fetch Just-QA'd Rows</strong> from Supabase (executeOnce, ordered by submitted_at desc) → <strong>Build Summary</strong> (technicalQA v5.0) → ClickUp comment + custom-field updates → advance ClickUp status.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (2.0v2)</div></div>
-    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (prompts) → Gemini → Supabase (results) → ClickUp</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">T1–T3 pass/fail recorded; ClickUp status advances.</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase (prompts) → Gemini → Supabase (per-file results, then aggregate fetch) → ClickUp</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">T1–T3 pass/fail recorded per file; ClickUp comment summarizes the batch with correct counts; ClickUp status advances.</div></div>
     <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All 3 pass → <code>brand qa</code> (Step 3). Any fail → manual review (Step 3a override path).</div></div>
     <div class="branch-grid">
       <div class="branch branch-success"><strong>All T1–T3 pass</strong><br>→ Brand QA (Step 3)</div>
       <div class="branch branch-fail"><strong>Any gate fails</strong><br>→ Manual review queue</div>
     </div>
     <div class="note note-resolved">Why 3 parallel calls for images: prevents lens-switching confusion. Each gate evaluates independently. Video uses 1 call (File API required for &gt;20MB).</div>
+    <div class="note note-resolved">2026-06-03 (PRD: resubmission-integrity Bug 3 fix): summary aggregation reads from Supabase via the new <strong>Fetch Just-QA'd Rows</strong> node, not from per-iteration parser nodes. Reason: n8n's <code>$('Node').all()</code> from a SplitInBatches done branch only returns the LAST iteration's items — using Supabase (the natural accumulator) bypasses this. The fetch node uses <code>executeOnce: true</code> (fires once regardless of upstream item count) — without it, the node would fire N times and counts would be off by N. See system_contracts.md → Known n8n Quirks.</div>
   </div>
 </div>
 </div>
