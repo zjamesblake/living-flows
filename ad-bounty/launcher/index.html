@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Bounty — Launcher Flow</title>
+<style>
+  :root {
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-tertiary: #888;
+    --bg-primary: #fff;
+    --bg-secondary: #fafafa;
+    --bg-tertiary: #f3f3f3;
+    --border: #e0e0e0;
+    --border-light: #eee;
+    --purple: #6C5CE7;
+    --purple-bg: #F0EFFE;
+    --teal: #00B894;
+    --teal-bg: #E8FAF5;
+    --amber: #E17055;
+    --amber-bg: #FEF0EC;
+    --blue: #0984E3;
+    --blue-bg: #E8F4FD;
+    --gray: #636E72;
+    --gray-bg: #F0F0F0;
+    --green: #00B894;
+    --green-bg: #E8FAF5;
+    --red-bg: #FFF0F0;
+    --red-text: #C0392B;
+    --yellow-bg: #FFF9E6;
+    --yellow-text: #8B6914;
+    --radius: 10px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-primary: rgba(255,255,255,0.9);
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-tertiary: rgba(255,255,255,0.4);
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #222;
+      --bg-tertiary: #2a2a2a;
+      --border: #3a3a3a;
+      --border-light: #333;
+      --purple-bg: #1E1A3A;
+      --teal-bg: #0A2A22;
+      --amber-bg: #2A1510;
+      --blue-bg: #0A1E2E;
+      --gray-bg: #2a2a2a;
+      --green-bg: #0A2A22;
+      --red-bg: #2A1010;
+      --red-text: #E74C3C;
+      --yellow-bg: #2A2510;
+      --yellow-text: #F1C40F;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+  .page { max-width: 780px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  .header { margin-bottom: 40px; }
+  .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .header p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+  .header .meta { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .header .meta span { font-size: 12px; color: var(--text-tertiary); background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px; }
+
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; padding: 12px 16px; background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: var(--radius); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .phase { margin-bottom: 36px; }
+  .phase-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; color: var(--text-tertiary); margin-bottom: 12px; padding-left: 4px; }
+
+  .step { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; background: var(--bg-secondary); overflow: hidden; }
+  .step-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
+  .step-header:hover { background: var(--bg-tertiary); }
+  .step-num { min-width: 28px; height: 28px; border-radius: 50%; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-info { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .step-subtitle { font-size: 12px; color: var(--text-secondary); }
+  .step-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .badge { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; padding: 2px 8px; border-radius: 4px; }
+  .badge-owner { background: var(--bg-tertiary); color: var(--text-secondary); }
+  .badge-system { background: var(--blue-bg); color: var(--blue); }
+  .badge-auto { background: var(--green-bg); color: var(--teal); }
+  .badge-manual { background: var(--yellow-bg); color: var(--yellow-text); }
+  .expand-icon { font-size: 16px; color: var(--text-tertiary); margin-top: 4px; transition: transform 0.2s; flex-shrink: 0; }
+  .step.open .expand-icon { transform: rotate(180deg); }
+
+  .step-details { display: none; border-top: 1px solid var(--border-light); padding: 14px 16px 14px 56px; }
+  .step.open .step-details { display: block; }
+  .detail-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+  .detail-label { min-width: 70px; font-weight: 500; color: var(--text-tertiary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; flex-shrink: 0; }
+  .detail-value { color: var(--text-primary); }
+  .detail-value.subtle { color: var(--text-secondary); }
+
+  .note { font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-top: 8px; line-height: 1.5; }
+  .note-resolved { background: var(--green-bg); color: var(--teal); }
+  .note-decision { background: var(--yellow-bg); color: var(--yellow-text); }
+
+  .arrow { text-align: center; color: var(--text-tertiary); font-size: 16px; margin: 2px 0; line-height: 1; }
+
+  .parallel-label { font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 500; color: var(--text-tertiary); text-align: center; margin: 8px 0; }
+  .parallel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 600px) { .parallel-grid { grid-template-columns: 1fr; } }
+
+  .quality-section { margin-top: 48px; }
+  .quality-section h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+  .quality-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; background: var(--bg-secondary); }
+  .quality-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .quality-item { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 6px; padding-left: 16px; position: relative; }
+  .quality-item::before { content: "→"; position: absolute; left: 0; color: var(--text-tertiary); }
+
+  .n-gray .step-num { background: var(--gray-bg); color: var(--gray); }
+  .n-purple .step-num { background: var(--purple-bg); color: var(--purple); }
+  .n-teal .step-num { background: var(--teal-bg); color: var(--teal); }
+  .n-amber .step-num { background: var(--amber-bg); color: var(--amber); }
+  .n-blue .step-num { background: var(--blue-bg); color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <h1>Ad Bounty — Launcher Flow</h1>
+  <p>Automatic upload of approved creatives into the brand's Meta ad account when a ClickUp task reaches <em>ready to launch</em>. All ads land PAUSED — the brand's media buyer activates them. Click any step to expand details.</p>
+  <div class="meta">
+    <span>Version 1.0 — June 2026</span>
+    <span>10 steps across 3 phases</span>
+    <span>~90 seconds per launch</span>
+    <span>Service: Python on Railway (web + worker)</span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Automated (Launcher)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Brand owner / media buyer</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Manual — Zak</div>
+</div>
+
+<!-- PHASE 0 -->
+<div class="phase">
+<div class="phase-label">Phase 0 — Per-brand onboarding (once per brand)</div>
+
+<div class="step n-blue" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">A</div>
+    <div class="step-info">
+      <div class="step-title">Config capture + QC gate</div>
+      <div class="step-subtitle">Collect Meta config + stock copy, validate green, enable the brand</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Zak + brand</span><span class="badge badge-system">Meta → Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Brand onboarding (skill: launcher-config-capture) or backfill outreach</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Brand provides: campaign, template ad set (inside that campaign, configured how they want Ad Bounty ads to run), page, default URL + CTA, 5–10 stock copy pairs. Zak completes access prerequisites (Advertiser share, system-user assignment). Rows inserted into brand_meta_config + brand_stock_copy.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Zak (outreach + access), brand (inputs)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Meta Business Manager + Supabase</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">validate_brand_config.py prints CONFIG QC: GREEN (row complete, adset inside campaign, account write-ready, URL reachable, ≥5 copy variants)</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">brand_meta_config.is_active = true at go-live → brand is Launcher-enabled</div></div>
+    <div class="note note-resolved">Rollout gate: brands WITHOUT an active config row are silently skipped — their tasks stay in the manual upload flow.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 1 -->
+<div class="phase">
+<div class="phase-label">Phase 1 — Trigger + validation (per launch)</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div class="step-info">
+      <div class="step-title">Task moves to "ready to launch"</div>
+      <div class="step-subtitle">Brand owner clicks the Ready to Launch button → n8n 6.0 sets Supabase + ClickUp status → ClickUp webhook fires</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">ClickUp → Railway</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp taskStatusUpdated webhook (team-level, HMAC-signed) on transition INTO "ready to launch"</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">POST /webhooks/clickup: verify signature, filter event, dedup on webhook_id:history_item_id (webhook_events PK), enqueue launch job, ack 202</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher web)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp → FastAPI (Railway) → Procrastinate queue (Supabase Postgres)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">webhook_events row (done) + queued launch_submission job</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Worker picks up the job → Step 2</div></div>
+    <div class="note note-resolved">Replay-safe: the same webhook delivered twice is deduped at the HTTP layer (proven live).</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div class="step-info">
+      <div class="step-title">Validate + idempotency</div>
+      <div class="step-subtitle">Load submissions rows + brand config, validate destination URL, upsert launch_run</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">Supabase + ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Worker starts launch_submission(clickup_task_id)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Load submissions rows at ready_to_launch (one per creative file). No active brand config → exit silently (manual-flow brand). Read Destination URL custom field (fallback: brand default), validate format + reachability. Compute idempotency_key = sha256(task_id | sorted drive_file_ids); upsert launch_runs — already succeeded → no-op exit.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher worker)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Supabase + ClickUp API</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">launch_runs row (in_flight) with destination URL + expected ad count</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Valid → Step 3. Invalid URL → Supabase final_status='approved' FIRST, then ClickUp status → approved + 🛑 comment with the fix (order matters — Guard G would undo a ClickUp-only revert).</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">3</div>
+    <div class="step-info">
+      <div class="step-title">Resolve copy</div>
+      <div class="step-subtitle">Creator-provided headline + primary text, else random pick from the brand's stock library</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">ClickUp + Supabase</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Validation passed</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Read Headline + Primary Text custom fields. Both filled → copy_source='creator'. Either blank → random active brand_stock_copy row → copy_source='stock'. Neither available → revert + comment (same path as invalid URL).</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher worker)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp custom fields + Supabase brand_stock_copy</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">One headline + primary text + CTA for the whole task (all ads share it — team decision)</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 4</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase">
+<div class="phase-label">Phase 2 — Meta creation (per launch)</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">4</div>
+    <div class="step-info">
+      <div class="step-title">Clone the brand's template ad set</div>
+      <div class="step-subtitle">One new ad set per task, cloned from source_adset_id via /copies — lands PAUSED and empty</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">Meta Marketing API</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Copy resolved (skipped on resume if the run already has an ad set)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">POST /{source_adset_id}/copies with deep_copy=false, status_option=PAUSED, DEEP_RENAME suffix. Clone preserves campaign, optimization, billing event, targeting, pixel + event. Clones into the SAME campaign as the source.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher worker)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Meta Marketing API</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">New PAUSED, empty ad set; id persisted to launch_runs.meta_adset_id</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 5 (per-creative loop)</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">5</div>
+    <div class="step-info">
+      <div class="step-title">Per creative: media → creative → PAUSED ad</div>
+      <div class="step-subtitle">One ad per submissions row. Download from Drive, upload to Meta, build creative, create ad</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">Drive → Meta</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Ad set ready; loop over the task's submissions rows (we know the exact drive_file_ids)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Video: SA download → chunked upload → poll ready → ffmpeg thumbnail → image hash. Image: direct upload. Then ad creative (page, copy, link + UTM, CTA) → ad (PAUSED) in the cloned ad set. Deterministic ad name; pre-create search adopts an existing ad instead of duplicating.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher worker)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Google Drive (service account) → Meta Marketing API</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Every Meta ID (video, image hash, creative, ad) persisted to submissions + launch_media_assets after EACH step; launch_actions log per step</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All assets done → Step 6. Per-asset failure → isolated (other ads continue), retried if transient.</div></div>
+    <div class="note note-resolved">Crash-safe: kill the worker mid-launch and the retry resumes exactly where it stopped — proven live with zero duplicate ads.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">6</div>
+    <div class="step-info">
+      <div class="step-title">Writeback</div>
+      <div class="step-subtitle">Supabase final_status='launched' + ClickUp → learning + ✅ comment with IDs</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">Supabase + ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">All ads created</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Per row: meta IDs + launched_at + launch_status='launched' + final_status='launched' (Launcher is the authoritative writer for its own ads; CM stays fallback for outside ads). Run marked succeeded. ClickUp status → learning + comment with ad set, ad IDs, Ads Manager link.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher worker)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Supabase + ClickUp</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">DB final_status='launched' == ClickUp 'learning' (existing convention); full forensic trail in launch_runs/actions/media_assets</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">→ Step 7 (human activation)</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">7</div>
+    <div class="step-info">
+      <div class="step-title">Media buyer activates</div>
+      <div class="step-subtitle">All ads land PAUSED — the brand's media buyer reviews and turns them on in Ads Manager</div>
+      <div class="step-badges"><span class="badge badge-manual">Manual</span><span class="badge badge-owner">Brand media buyer</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">New PAUSED ads appear in the brand's Ad Bounty campaign</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Review the cloned ad set + ads, adjust if desired, set ACTIVE when ready</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Brand media buyer</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Meta Ads Manager</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Live spend on creator ads; spend tracked by the existing CM/SP payout pipeline via the captured ad IDs</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Performance attribution: every ad traces to a submissions row via meta_ad_id</div></div>
+    <div class="note note-decision">Phase 2+: per-brand opt-in to ACTIVE-on-create once trust is established.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase">
+<div class="phase-label">Phase 3 — Failure handling + safety nets (always on)</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">8</div>
+    <div class="step-info">
+      <div class="step-title">Transient failures auto-retry</div>
+      <div class="step-subtitle">Meta rate limits / processing hiccups → exponential backoff, max 6 attempts, resume-only-failed</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">Procrastinate</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Meta transient error codes (1/2/4/17/32/613) or video-processing timeout anywhere in the launch</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">HTTP-level retry inside each Meta call, then job-level retry (3s→243s backoff). Created ads are kept; the retry resumes only what failed.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Launcher worker + Procrastinate queue</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">⚠️ "retrying automatically" ClickUp comment on partial; ✅ comment when the retry completes</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Success → Step 6 writeback. Exhausted → run stays partial/failed, caught by Step 10.</div></div>
+    <div class="note note-resolved">Proven live: a real EAM 1 rate limit hit mid-test; the run went partial, retried on schedule, and completed clean.</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">9</div>
+    <div class="step-info">
+      <div class="step-title">Permanent failures comment with an action item</div>
+      <div class="step-subtitle">Bad page permission, missing config, invalid account → no retry loop, a human gets a specific fix</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">ClickUp</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Non-transient Meta error (permissions, invalid IDs) at any step</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Run marked failed/partial with error_summary; submissions rows get launch_failure_reason; ❌ ClickUp comment names the step and the fix; re-trigger by moving the task back to ready to launch after fixing</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (comment) → Zak (fix)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp task comments (no #ops-digest, no DMs — Phase 1 decision)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Actionable comment + full forensic trail (launch_actions has error code/message per step)</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Human fixes root cause → re-trigger → idempotent resume</div></div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">10</div>
+    <div class="step-info">
+      <div class="step-title">Daily reconciler</div>
+      <div class="step-subtitle">Anything stuck at ready_to_launch &gt;30 min gets its launch re-deferred (Launcher-enabled brands only)</div>
+      <div class="step-badges"><span class="badge badge-auto">Automated</span><span class="badge badge-system">Procrastinate cron</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Cron 13:00 UTC daily (RECONCILER_CRON; configurable to 2x/day)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Scan submissions stuck at ready_to_launch (joined to active brand_meta_config); re-defer launch_submission per task. Safe because the job is idempotent end-to-end.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher worker)</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Procrastinate periodic task</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Missed webhooks / crashed runs self-heal within a day</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Re-deferred jobs enter Step 2</div></div>
+  </div>
+</div>
+</div>
+
+<!-- QUALITY REVIEW -->
+<div class="quality-section">
+<h2>Quality Review</h2>
+
+<div class="quality-card">
+  <h3>1. What breaks?</h3>
+  <div class="quality-item"><strong>Webhook never arrives:</strong> Daily reconciler picks up anything stuck &gt;30 min. Worst case: one day late, never lost.</div>
+  <div class="quality-item"><strong>Same webhook delivered twice / task re-flipped:</strong> Three idempotency layers (webhook_events PK, launch_runs idempotency_key, deterministic ad names + adopt-by-name). Proven: replay produced zero duplicates.</div>
+  <div class="quality-item"><strong>Worker dies mid-launch:</strong> Every Meta ID is persisted the moment it exists; resume skips completed assets. Proven via SIGKILL test.</div>
+  <div class="quality-item"><strong>Accidental spend:</strong> Impossible by design — every object lands PAUSED; only the brand's media buyer activates.</div>
+  <div class="quality-item"><strong>Wrong campaign placement:</strong> /copies clones into the source ad set's campaign; the Config QC gate asserts source_adset_id lives inside the brand's Ad Bounty campaign before enablement.</div>
+</div>
+
+<div class="quality-card">
+  <h3>2. Who knows?</h3>
+  <div class="quality-item"><strong>Success:</strong> ClickUp comment with ad set + ad IDs + Ads Manager link; status → learning.</div>
+  <div class="quality-item"><strong>Validation failure:</strong> Task reverts to approved with a 🛑 comment naming the exact problem (missing/invalid URL, no copy).</div>
+  <div class="quality-item"><strong>Permanent failure:</strong> ❌ comment with the failing step and the fix. The comment trail + status tells the whole story without opening other tools.</div>
+  <div class="quality-item"><strong>Forensics:</strong> /admin/runs endpoint + launch_runs/launch_actions/launch_media_assets give per-step history for any launch.</div>
+</div>
+
+<div class="quality-card">
+  <h3>3. What's the fallback?</h3>
+  <div class="quality-item"><strong>Launcher down entirely:</strong> The manual upload flow still works — nothing in the old path was removed. Tasks just sit at ready to launch.</div>
+  <div class="quality-item"><strong>Brand not yet onboarded:</strong> Silently skipped by design; manual flow unaffected.</div>
+  <div class="quality-item"><strong>Drive file moved/deleted:</strong> Download 404s → permanent-failure comment names the file.</div>
+  <div class="quality-item"><strong>Stuck partial run:</strong> Move the task back to ready to launch (or wait for the reconciler) — resume is idempotent.</div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('open');
+}
+document.querySelector('.step').classList.add('open');
+</script>
+</body>
+</html>
