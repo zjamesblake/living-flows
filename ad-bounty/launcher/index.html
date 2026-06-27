@@ -140,6 +140,70 @@
   <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Manual — Zak</div>
 </div>
 
+<!-- V2 ADVANCED PATH -->
+<div class="phase">
+<div class="phase-label">V2 — Advanced path (media-buyer cockpit · launch_mode = advanced)</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">V1</div>
+    <div class="step-info">
+      <div class="step-title">Queue — auto-fire suppressed</div>
+      <div class="step-subtitle">ready to launch only QUEUES the task; no ads created yet</div>
+      <div class="step-badges"><span class="badge badge-system">Launcher API</span><span class="badge badge-owner">Media buyer</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp ready to launch for an advanced-mode brand</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">The webhook job loads brand_meta_config, sees launch_mode='advanced', and returns early — no launch row, no Meta call. The task surfaces in the buyer's cockpit queue (GET /api/brands/{id}/queue, oldest first) with creator + creatives.</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Launcher API (FastAPI) + Supabase</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Task queued for the buyer; nothing in Meta</div></div>
+    <div class="note note-resolved">Auth: every endpoint verifies the Supabase JWT (/auth/v1/user) and enforces user_brand_access server-side. The buyer sees only granted advanced-mode brands.</div>
+  </div>
+</div>
+
+<div class="step n-purple" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">V2</div>
+    <div class="step-info">
+      <div class="step-title">Assemble draft + override</div>
+      <div class="step-subtitle">select 1+ tasks → draft (nothing in Meta) → edit destination + copy</div>
+      <div class="step-badges"><span class="badge badge-owner">Media buyer</span><span class="badge badge-system">Cockpit + API</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Buyer selects task(s) in the cockpit → Assemble</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">POST /api/launches → the bounty adapter builds a launches(draft) + one launch_item per creative, resolving copy (creator copy if submitted, else brand stock). Buyer reviews/overrides per ad (campaign, ad set new-from-template OR existing, headline/primary/CTA/link/UTM) — saved via PATCH; only edited ads are sent (preserves copy_source). Multi-task → one ad set.</div></div>
+    <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Media buyer</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">A reviewed draft launch; campaigns/ad sets come live from Meta (GET …/campaigns, /adsets)</div></div>
+    <div class="note note-resolved">Nothing is created in Meta until Push. Pre-push validation blocks empty copy / invalid URLs.</div>
+  </div>
+</div>
+
+<div class="step n-teal" onclick="toggle(this)">
+  <div class="step-header">
+    <div class="step-num">V3</div>
+    <div class="step-info">
+      <div class="step-title">Push → shared engine → per-task writeback</div>
+      <div class="step-subtitle">resolve ad set → create one PAUSED ad per item → write each task back</div>
+      <div class="step-badges"><span class="badge badge-system">Engine core + worker</span></div>
+    </div>
+    <div class="expand-icon">▾</div>
+  </div>
+  <div class="step-details">
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Buyer clicks Push → POST /api/launches/{id}/push (enqueues push_launch)</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">The SAME engine core as the auto path (Phase 2): resolve_adset (clone template + rename, or use chosen existing) → create_one_ad per item (download → upload → creative → PAUSED ad), every Meta ID persisted immediately. Cockpit polls GET /api/launches/{id} for live progress.</div></div>
+    <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Procrastinate worker + engine/core.py + Meta</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">PAUSED ads in the chosen ad set; per-SOURCE-TASK writeback — each ClickUp task → learning (+ comment, ad IDs, Ads Manager link) ONLY when all its items land; a task with any failure stays put and is flagged</div></div>
+    <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Buyer reviews the PAUSED ads in Meta → activates</div></div>
+    <div class="note note-resolved">Same idempotency + resume-safety as the auto path (deterministic ad name + find_ads_by_name; every Meta ID persisted). Unified model: launches / launch_items (auto = the N=1 degenerate case).</div>
+  </div>
+</div>
+<div class="note note-resolved" style="margin-top:8px">Phases 1–3 below are the <strong>auto path</strong> and the <strong>shared engine</strong> both paths call. Full V2 contract: system_contracts.md → Boundary 26 → "V2 — Advanced Launcher".</div>
+</div>
+
 <!-- PHASE 0 -->
 <div class="phase">
 <div class="phase-label">Phase 0 — Per-brand onboarding (once per brand)</div>
