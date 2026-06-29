@@ -376,7 +376,7 @@
     <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Video: SA download → chunked upload → poll ready → ffmpeg thumbnail → image hash. Image: direct upload. Then ad creative (page, copy, link + UTM, CTA) → ad (PAUSED) in the cloned ad set. Deterministic ad name; pre-create search adopts an existing ad instead of duplicating.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher worker)</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Google Drive (service account) → Meta Marketing API</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Every Meta ID (video, image hash, creative, ad) persisted to submissions + launch_media_assets after EACH step; launch_actions log per step</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Every Meta ID (video, image hash, creative, ad) persisted to submissions + launch_items after EACH step; launch_actions log per step</div></div>
     <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">All assets done → Step 6. Per-asset failure → isolated (other ads continue), retried if transient.</div></div>
     <div class="note note-resolved">Crash-safe: kill the worker mid-launch and the retry resumes exactly where it stopped — proven live with zero duplicate ads.</div>
   </div>
