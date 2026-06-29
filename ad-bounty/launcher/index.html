@@ -140,6 +140,41 @@
   <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Manual — Zak</div>
 </div>
 
+<!-- OPERATING SOPs -->
+<div class="quality-section" style="margin-top:0">
+<h2>Operating the Launcher — team SOPs</h2>
+
+<div class="quality-card">
+  <h3>Media buyer — run a launch (advanced-mode brands)</h3>
+  <div class="quality-item">Log in to the <strong>cockpit</strong> (<code>ad-bounty-launcher-cockpit.vercel.app</code>) — you see only the brands you're granted.</div>
+  <div class="quality-item">Open the brand's <strong>queue</strong> (tasks at <em>ready to launch</em>, oldest first) and select one or more tasks to launch together.</div>
+  <div class="quality-item"><strong>Assemble</strong> → review each ad: destination URL, headline / primary text / CTA (creator copy if supplied, else brand stock), and ad set (clone the brand's template, or pick an existing one). Edit anything; only edited ads are changed.</div>
+  <div class="quality-item"><strong>Preview</strong>, then <strong>Push</strong>. The engine creates one <strong>PAUSED</strong> ad per creative; the task flips to <em>learning</em> only once all its ads land.</div>
+  <div class="quality-item">Open Ads Manager, review the paused ads, and <strong>activate</strong> when ready. Nothing spends until you do.</div>
+</div>
+
+<div class="quality-card">
+  <h3>Auto-mode brands</h3>
+  <div class="quality-item">No cockpit step. <em>Ready to launch</em> auto-creates the PAUSED ads; the brand's media buyer just reviews and activates in Ads Manager.</div>
+</div>
+
+<div class="quality-card">
+  <h3>Onboard a brand to the Launcher</h3>
+  <div class="quality-item"><strong>Collect from the brand:</strong> their Ad Bounty campaign, a template ad set inside it, the Facebook page, default landing URL + CTA, and 5–10 stock copy pairs.</div>
+  <div class="quality-item"><strong>Access (Zak):</strong> partner share at Advertiser level + ad account assigned to the system user with ADVERTISE. The page works via the BM share — a page <em>read</em> failing is normal; the first paused launch is the real test.</div>
+  <div class="quality-item"><strong>Provision:</strong> insert the <code>brand_meta_config</code> row (+ <code>launch_mode</code>) and stock copy; for advanced mode also grant each buyer cockpit access.</div>
+  <div class="quality-item"><strong>Gate:</strong> <code>validate_brand_config.py</code> must print CONFIG QC: GREEN, then set <code>is_active = true</code>. Brands without an active config are silently skipped (stay on the manual flow).</div>
+</div>
+
+<div class="quality-card">
+  <h3>When a launch fails or gets stuck</h3>
+  <div class="quality-item"><strong>Read the ClickUp comment</strong> — every failure names the step and the fix (bad URL, missing copy, page permission, etc.). The comment trail + status tells the whole story.</div>
+  <div class="quality-item"><strong>Transient</strong> errors (Meta rate limits, video processing) retry automatically — no action needed.</div>
+  <div class="quality-item"><strong>Permanent</strong> errors: fix the root cause, then move the task back to <em>ready to launch</em> to re-trigger. Resume is idempotent — no duplicate ads. (Or wait for the daily reconciler.)</div>
+</div>
+
+</div>
+
 <!-- V2 ADVANCED PATH -->
 <div class="phase">
 <div class="phase-label">V2 — Advanced path (media-buyer cockpit · launch_mode = advanced)</div>
