@@ -505,7 +505,7 @@
 <div class="quality-card">
   <h3>1. What breaks?</h3>
   <div class="quality-item"><strong>Webhook never arrives:</strong> Daily reconciler picks up anything stuck &gt;30 min. Worst case: one day late, never lost.</div>
-  <div class="quality-item"><strong>Same webhook delivered twice / task re-flipped:</strong> Three idempotency layers (webhook_events PK, launch_runs idempotency_key, deterministic ad names + adopt-by-name). Proven: replay produced zero duplicates.</div>
+  <div class="quality-item"><strong>Same webhook delivered twice / task re-flipped:</strong> Three idempotency layers (webhook_events PK, launches idempotency_key, deterministic ad names + adopt-by-name). Proven: replay produced zero duplicates.</div>
   <div class="quality-item"><strong>Worker dies mid-launch:</strong> Every Meta ID is persisted the moment it exists; resume skips completed assets. Proven via SIGKILL test.</div>
   <div class="quality-item"><strong>Accidental spend:</strong> Impossible by design — every object lands PAUSED; only the brand's media buyer activates.</div>
   <div class="quality-item"><strong>Wrong campaign placement:</strong> /copies clones into the source ad set's campaign; the Config QC gate asserts source_adset_id lives inside the brand's Ad Bounty campaign before enablement.</div>
