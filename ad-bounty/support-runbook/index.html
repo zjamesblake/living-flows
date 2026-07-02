@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ad Bounty — Support Runbook</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#131a22; --panel2:#0f151c; --line:#26313d;
+    --ink:#e6edf3; --muted:#8b98a5;
+    --bot:#2dd4bf; --console:#60a5fa; --admin:#c084fc; --auto:#fbbf24;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#0b0f14,#0b0f14ee);
+    border-bottom:1px solid var(--line);padding:18px 22px 14px}
+  h1{margin:0;font-size:20px;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:13px;margin-top:3px}
+  .wrap{max-width:980px;margin:0 auto;padding:22px}
+  .bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .legend{display:flex;flex-wrap:wrap;gap:12px}
+  .lg{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .roles{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 16px;
+    margin:0 0 20px;font-size:13px;color:var(--muted)}
+  .roles b{color:var(--ink)}
+  section{margin:0 0 26px}
+  h2{font-size:15px;margin:0 0 12px;padding-left:10px;border-left:3px solid var(--console)}
+  .grid{display:grid;gap:10px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .card>.head{display:flex;align-items:center;gap:11px;padding:13px 15px;cursor:pointer;user-select:none}
+  .card>.head:hover{background:#172029}
+  .tag{width:9px;height:26px;border-radius:4px;flex:0 0 auto}
+  .q{flex:1;font-weight:600;font-size:14px}
+  .q .said{color:var(--muted);font-weight:400;font-size:12px;display:block;margin-top:1px}
+  .chev{color:var(--muted);transition:transform .18s;font-size:12px}
+  .card.open .chev{transform:rotate(90deg)}
+  .body{display:none;padding:2px 15px 15px 35px;font-size:13.5px}
+  .card.open .body{display:block}
+  .body .row{margin:7px 0}
+  .body .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-right:6px;vertical-align:middle}
+  .p-bot{background:#0e3a34;color:var(--bot)} .p-console{background:#13263f;color:var(--console)}
+  .p-admin{background:#2a1b3d;color:var(--admin)} .p-auto{background:#3a2e0e;color:var(--auto)}
+  code{background:#0b1119;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#a5f3e4;font-size:12.5px}
+  .foot{margin-top:8px;border-top:1px solid var(--line);padding-top:20px}
+  .note{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin:0 0 12px}
+  .note h3{margin:0 0 8px;font-size:13.5px}
+  .note.parked h3{color:var(--auto)} .note.ok h3{color:var(--bot)} .note.accept h3{color:var(--console)}
+  .note ul{margin:6px 0 0;padding-left:18px;color:var(--muted)} .note li{margin:4px 0}
+  .note li b{color:var(--ink)}
+  .stamp{color:var(--muted);font-size:12px;margin-top:18px;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap" style="padding:0">
+    <h1>Ad Bounty — Support Runbook</h1>
+    <div class="sub">When a creator opens a ticket → what to do. Click any row to expand.</div>
+    <div class="bar">
+      <div class="legend">
+        <span class="lg"><span class="dot" style="background:var(--bot)"></span> student self-serve (bot)</span>
+        <span class="lg"><span class="dot" style="background:var(--console)"></span> support action (dashboard)</span>
+        <span class="lg"><span class="dot" style="background:var(--admin)"></span> admin / escalate to Zak</span>
+        <span class="lg"><span class="dot" style="background:var(--auto)"></span> automatic / manual</span>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="roles">
+    <b>Support:</b> Astrid, Karlo, Lovro &nbsp;·&nbsp; <b>Admin:</b> Zak, Ghed &nbsp;·&nbsp;
+    <b>Dashboard:</b> ad-bounty-dashboard.vercel.app (open the creator's profile) &nbsp;·&nbsp;
+    <b>Bot commands:</b> creator types them in <code>#bounty-bot</code>
+  </div>
+
+  <!-- 1. CREATOR -->
+  <section>
+    <h2>1 · Student / Creator</h2>
+    <div class="grid">
+      <div class="card"><div class="head"><span class="tag" style="background:var(--console)"></span>
+        <span class="q">"I never got my welcome message / any DMs"<span class="said">DMs disabled, or unreachable</span></span><span class="chev">▶</span></div>
+        <div class="body">
+          <div class="row"><span class="pill p-console">DASHBOARD</span> Open their profile → check the <b>reachability badge</b>.</div>
+          <div class="row">If <b>unreachable</b>: have them turn on DMs (Server → Privacy Settings → allow DMs), then click <b>Re-send Welcome</b>.</div>
+          <div class="row">If they still can't receive DMs: tell them to run <code>/me</code> and <code>/status</code> in <code>#bounty-bot</code> for everything — the bot is their fallback.</div>
+        </div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--console)"></span>
+        <span class="q">"My WHOP lapsed — I fixed my payment but I'm still locked out"<span class="said">can't submit</span></span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-console">DASHBOARD</span> Click <b>Refresh WHOP</b> on their profile — re-checks WHOP instantly and restores them. No waiting for the nightly job.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--console)"></span>
+        <span class="q">"My name / country is wrong"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-console">DASHBOARD</span> <b>Edit Profile</b> — support can fix name, Discord username, country, and notes.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--admin)"></span>
+        <span class="q">"My WHOP email / Discord ID is wrong"<span class="said">load-bearing keys</span></span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-admin">ESCALATE</span> These are locked to admins (a wrong value silently breaks WHOP checks or DM routing). Hand to <b>Zak / Ghed</b>.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"I need to update my payout method"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> Tell them to run <code>/payment-info</code> in <code>#bounty-bot</code> — fully self-serve.</div>
+          <div class="row"><span class="pill p-console">DASHBOARD</span> Or edit their payment fields on the profile.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"Am I approved? What's my status?"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> <code>/me</code> — shows their status, Creator ID, and brands.</div></div></div>
+    </div>
+  </section>
+
+  <!-- 2. ENROLLMENT -->
+  <section>
+    <h2>2 · Enrollment</h2>
+    <div class="grid">
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"How do I join a brand?"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> <code>/me</code> — lists available brands with enrollment links.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--console)"></span>
+        <span class="q">"I never got my enrollment confirmation"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-console">DASHBOARD</span> Profile → Enrollment → <b>Re-send Confirmation</b> for that brand.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"I didn't get / I lost my dashboard link"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> Fastest: tell them to run <code>/me</code> — it shows their dashboard link per brand.</div>
+          <div class="row"><span class="pill p-console">DASHBOARD</span> Or Enrollment → <b>Re-send Dashboard</b>.</div>
+          <div class="row"><span class="pill p-admin">ESCALATE</span> If no dashboard link exists yet (setup never ran), hand to Zak.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"Where's my submission link?"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> <code>/me</code> — shows the submit link for each enrolled brand.</div></div></div>
+    </div>
+  </section>
+
+  <!-- 3. SUBMISSION & QA -->
+  <section>
+    <h2>3 · Submission &amp; QA</h2>
+    <div class="grid">
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"Where's my ad? I haven't heard back"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> <code>/status</code> — shows every active submission, its stage, and time-in-stage. Accurate and up to date.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--console)"></span>
+        <span class="q">"I didn't get my revision request / I don't understand it"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-console">DASHBOARD</span> Submissions → <b>Re-send Revision</b> to re-deliver the feedback + resubmit link.</div>
+          <div class="row"><span class="pill p-bot">BOT</span> Or <code>/revisions</code> shows open revisions with the failed gates.</div>
+          <div class="row"><span class="pill p-auto">MANUAL</span> If the feedback itself is unclear, that's a support-ticket conversation (no self-serve path).</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"Where do I resubmit?"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> <code>/revisions</code> or <code>/status</code> — the resubmit link is inline.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--auto)"></span>
+        <span class="q">"Did my resubmission go through?"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-auto">AUTOMATIC</span> They receive a resubmission confirmation DM. Also visible via <code>/status</code>.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"Was my ad approved? Is it live?"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> <code>/status</code> shows <b>ready to launch</b> / <b>launched</b> — reliable now that the matcher runs. That's everything they need.</div>
+          <div class="row" style="color:var(--muted)">Note: we don't fire a DM on launch today (parked — nice-to-have, not pressing).</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--auto)"></span>
+        <span class="q">"My submission has been stuck for days"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-auto">HANDLED</span> Rare — Zak runs a daily queue sweep, so nothing sits in QA longer than ~a day. Reassure them; if it's genuinely stuck past that, flag Zak.</div></div></div>
+    </div>
+  </section>
+
+  <!-- 4. PAYOUT -->
+  <section>
+    <h2>4 · Payout</h2>
+    <div class="grid">
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"My payment info is wrong / needs updating"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> <code>/payment-info</code> — self-serve view + update (audited).</div>
+          <div class="row"><span class="pill p-console">DASHBOARD</span> Or support edits payment fields on the profile.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--auto)"></span>
+        <span class="q">"I wasn't paid / I'm missing a payout"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-auto">HANDLED</span> Reassure: failed payments are automatically detected and re-sent in a mid-month sweep (~10 days after the payout run). Have them confirm their payout method is correct via <code>/payment-info</code>.</div>
+          <div class="row"><span class="pill p-admin">ESCALATE</span> If it's still missing after that sweep, hand to Zak.</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--admin)"></span>
+        <span class="q">"My payout amount looks wrong"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-admin">ESCALATE</span> Hand to Zak — adjustments run through the payout-adjust process (admin only).</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--auto)"></span>
+        <span class="q">"When will I get paid?"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-auto">INFO</span> Spend is pulled around the 3rd of the month; payments go out over the following week. Creators receive a DM when their payment is being processed.</div></div></div>
+    </div>
+  </section>
+
+  <!-- 5. BRAND -->
+  <section>
+    <h2>5 · Brand</h2>
+    <div class="grid">
+      <div class="card"><div class="head"><span class="tag" style="background:var(--bot)"></span>
+        <span class="q">"A brand I'm in went away" / "Can I join a new brand?"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-bot">BOT</span> <code>/me</code> always reflects their current + available brands.</div>
+          <div class="row" style="color:var(--muted)">Brand open/close announcements are handled by Zak (brands rarely toggle).</div></div></div>
+      <div class="card"><div class="head"><span class="tag" style="background:var(--auto)"></span>
+        <span class="q">"How do I contact a brand directly?"</span><span class="chev">▶</span></div>
+        <div class="body"><div class="row"><span class="pill p-auto">MANUAL</span> No in-system channel. Brand owners communicate requirements in the community channels; point creators there.</div></div></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div class="note ok"><h3>✓ Already handled (not gaps)</h3>
+      <ul>
+        <li><b>Resubmission confirmation</b> — creators do get a DM when a resubmission lands.</li>
+        <li><b>"Is my ad live?"</b> — the matcher keeps <code>/status</code> accurate; that covers it.</li>
+        <li><b>Stuck submissions</b> — the daily queue sweep clears QA within ~a day.</li>
+        <li><b>Failed payments</b> — the mid-month sweep auto-detects bounces and re-sends.</li>
+      </ul></div>
+    <div class="note accept"><h3>~ Accepted limitations (works, just not self-serve)</h3>
+      <ul>
+        <li><b>Payout history</b> — no student self-serve view; support checks the dashboard, and creators get a processing DM.</li>
+        <li><b>Revision follow-up questions</b> — handled via support ticket.</li>
+        <li><b>Brand contact</b> — via the community channels, not an in-system channel.</li>
+      </ul></div>
+    <div class="note parked"><h3>◔ Parked ideas (nice-to-have, not now)</h3>
+      <ul>
+        <li><b>"Your ad launched" DM</b> — proactive launch notification.</li>
+        <li><b>Student-facing QA guide</b> — plain-language explanation of the gate criteria.</li>
+      </ul></div>
+  </div>
+
+  <div class="stamp">Living document · edit <code>ad-bounty/support-runbook/flow.html</code> · reflects the operator console shipped 2026-06-19</div>
+</div>
+<script>
+  document.querySelectorAll('.card .head').forEach(h=>{
+    h.addEventListener('click',()=>h.parentElement.classList.toggle('open'));
+  });
+</script>
+</body>
+</html>
