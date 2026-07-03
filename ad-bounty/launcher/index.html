@@ -148,7 +148,7 @@
   <h3>Media buyer — run a launch (advanced-mode brands)</h3>
   <div class="quality-item">Log in to the <strong>cockpit</strong> (<code>ad-bounty-launcher-cockpit.vercel.app</code>) — you see only the brands you're granted.</div>
   <div class="quality-item">Open the brand's <strong>queue</strong> (tasks at <em>ready to launch</em>, oldest first) and select one or more tasks to launch together.</div>
-  <div class="quality-item"><strong>Assemble</strong> → review each ad: destination URL, headline / primary text / CTA (creator copy if supplied, else brand stock), and ad set (clone the brand's template, or pick an existing one). Edit anything; only edited ads are changed.</div>
+  <div class="quality-item"><strong>Assemble</strong> → review each ad: destination URL, headline / primary text / CTA (creator copy if supplied, else brand stock) — add up to 4 extra text/headline variations per ad if wanted — and ad set (clone the brand's template, or pick an existing one; name pre-filled from the brand's naming template when configured). Edit anything; only edited ads are changed.</div>
   <div class="quality-item"><strong>Preview</strong>, then <strong>Push</strong>. The engine creates one <strong>PAUSED</strong> ad per creative; the task flips to <em>learning</em> only once all its ads land.</div>
   <div class="quality-item">Open Ads Manager, review the paused ads, and <strong>activate</strong> when ready. Nothing spends until you do.</div>
 </div>
@@ -210,7 +210,7 @@
   </div>
   <div class="step-details">
     <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Buyer selects task(s) in the cockpit → Assemble</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">POST /api/launches → the bounty adapter builds a launches(draft) + one launch_item per creative, resolving copy (creator copy if submitted, else brand stock). Buyer reviews/overrides per ad (campaign, ad set new-from-template OR existing, headline/primary/CTA/link/UTM) — saved via PATCH; only edited ads are sent (preserves copy_source). Multi-task → one ad set.</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">POST /api/launches → the bounty adapter builds a launches(draft) + one launch_item per creative, resolving copy (creator copy if submitted, else brand stock). Buyer reviews/overrides per ad (campaign, ad set new-from-template OR existing, headline/primary/CTA/link/UTM, plus up to 4 extra primary-text and headline variations per ad — Meta rotates and optimizes) — saved via PATCH; only edited ads are sent (preserves copy_source). The new-ad-set name pre-fills from the brand's naming template (brand_meta_config.adset_name_template, tokens {brand} {task} {date}) when set; always editable. Multi-task → one ad set.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Media buyer</div></div>
     <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">A reviewed draft launch; campaigns/ad sets come live from Meta (GET …/campaigns, /adsets)</div></div>
     <div class="note note-resolved">Nothing is created in Meta until Push. Pre-push validation blocks empty copy / invalid URLs.</div>
