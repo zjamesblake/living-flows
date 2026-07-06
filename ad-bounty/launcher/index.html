@@ -331,7 +331,7 @@
   </div>
   <div class="step-details">
     <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Validation passed</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Read Headline + Primary Text custom fields. Both filled → copy_source='creator'. Either blank → random active brand_stock_copy row → copy_source='stock'. Neither available → revert + comment (same path as invalid URL).</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Read Headline + Primary Text custom fields. Both filled → copy_source='creator'. Either blank → the missing field is filled by a random active brand_copy_library entry of that kind (headline / primary text, chosen independently) → copy_source='stock'. Kind unavailable → revert + comment (same path as invalid URL).</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher worker)</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">ClickUp custom fields + Supabase brand_stock_copy</div></div>
     <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">One headline + primary text + CTA for the whole task (all ads share it — team decision)</div></div>
