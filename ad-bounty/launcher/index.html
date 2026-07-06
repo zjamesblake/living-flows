@@ -162,7 +162,7 @@
   <h3>Onboard a brand to the Launcher</h3>
   <div class="quality-item"><strong>Collect from the brand:</strong> their Ad Bounty campaign, a template ad set inside it, the Facebook page, default landing URL + CTA, and the copy library — ≥5 headlines and ≥5 primary texts (chosen independently, mix-and-match).</div>
   <div class="quality-item"><strong>Access (Zak):</strong> partner share at Advertiser level + ad account assigned to the system user with ADVERTISE. The page works via the BM share — a page <em>read</em> failing is normal; the first paused launch is the real test.</div>
-  <div class="quality-item"><strong>Provision:</strong> insert the <code>brand_meta_config</code> row (+ <code>launch_mode</code>) and stock copy; for advanced mode also grant each buyer cockpit access.</div>
+  <div class="quality-item"><strong>Provision:</strong> insert the <code>brand_meta_config</code> row (+ <code>launch_mode</code>) and the copy library (<code>brand_copy_library</code>); for advanced mode also grant each buyer cockpit access.</div>
   <div class="quality-item"><strong>Gate:</strong> <code>validate_brand_config.py</code> must print CONFIG QC: GREEN, then set <code>is_active = true</code>. Brands without an active config are silently skipped (stay on the manual flow).</div>
 </div>
 
