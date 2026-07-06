@@ -226,19 +226,19 @@
   <div class="step-header">
     <div class="step-num">V3</div>
     <div class="step-info">
-      <div class="step-title">Push → shared engine → per-task writeback</div>
-      <div class="step-subtitle">resolve ad set → create one PAUSED ad per item → write each task back</div>
+      <div class="step-title">Push (non-blocking) → shared engine → per-task writeback</div>
+      <div class="step-subtitle">returns to queue; background tray tracks it → resolve each ad-set group → one PAUSED ad per item → write each task back</div>
       <div class="step-badges"><span class="badge badge-system">Engine core + worker</span></div>
     </div>
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Buyer clicks Push → POST /api/launches/{id}/push (enqueues push_launch)</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">The SAME engine core as the auto path (Phase 2): resolve_adset (clone template + rename, or use chosen existing) → create_one_ad per item (download → upload → creative → PAUSED ad), every Meta ID persisted immediately. Cockpit polls GET /api/launches/{id} for live progress.</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Buyer clicks Push → POST /api/launches/{id}/push (202, enqueues push_launch). The cockpit returns the buyer to the queue immediately — a color-coded header tray polls in-flight launches so they can assemble the next batch while this one cooks.</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">The SAME engine core as the auto path (Phase 2): one list_ads prefetch per launch (idempotency, rate-limit-backed) → resolve each ad-set group (Model 2 — <em>new</em>: clone source + rename to template+append; <em>existing</em>: use the pre-set ad set AS-IS, never cloned) → create_one_ad per item into its group's ad set (download → upload → creative → PAUSED ad), every Meta ID persisted immediately. Ad names carry the task token + seq + a unique ref (Matcher/idempotency), no legacy prefix.</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Procrastinate worker + engine/core.py + Meta</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">PAUSED ads in the chosen ad set; per-SOURCE-TASK writeback — each ClickUp task → learning (+ comment, ad IDs, Ads Manager link) ONLY when all its items land; a task with any failure stays put and is flagged</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">PAUSED ads in the resolved/existing ad set(s); per-SOURCE-TASK writeback — each ClickUp task → learning (+ comment, ad IDs, Ads Manager link) ONLY when all its items land; a task with any failure stays put and is flagged. Failures show in the tray + Launch History with the error; a failed/partial batch is one-click Retry (idempotent re-push — resumes failed items only).</div></div>
     <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Buyer reviews the PAUSED ads in Meta → activates</div></div>
-    <div class="note note-resolved">Same idempotency + resume-safety as the auto path (deterministic ad name + find_ads_by_name; every Meta ID persisted). Unified model: launches / launch_items (auto = the N=1 degenerate case).</div>
+    <div class="note note-resolved">Same idempotency + resume-safety as the auto path (deterministic ad name + prefetch-adopt; every Meta ID persisted; existing ad sets + resolved groups never re-created on retry). Unified model: launches / launch_adsets / launch_items (auto = the N=1, single-'ALL'-group degenerate case).</div>
   </div>
 </div>
 <div class="note note-resolved" style="margin-top:8px">Phases 1–3 below are the <strong>auto path</strong> and the <strong>shared engine</strong> both paths call. Full V2 contract: system_contracts.md → Boundary 26 → "V2 — Advanced Launcher".</div>
