@@ -263,7 +263,7 @@
     <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Brand provides: campaign, template ad set (inside that campaign, configured how they want Ad Bounty ads to run), page, default URL + CTA, and the copy library (≥5 headlines + ≥5 primary texts). Zak completes access prerequisites (Advertiser share, system-user assignment). Rows inserted into brand_meta_config + brand_copy_library.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Zak (outreach + access), brand (inputs)</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Meta Business Manager + Supabase</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">validate_brand_config.py prints CONFIG QC: GREEN (row complete, adset inside campaign, account write-ready, URL reachable, ≥5 copy variants)</div></div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">validate_brand_config.py prints CONFIG QC: GREEN (row complete, adset inside campaign, account write-ready, URL reachable, ≥5 headlines AND ≥5 primary texts)</div></div>
     <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">brand_meta_config.is_active = true at go-live → brand is Launcher-enabled</div></div>
     <div class="note note-resolved">Rollout gate: brands WITHOUT an active config row are silently skipped — their tasks stay in the manual upload flow.</div>
   </div>
