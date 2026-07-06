@@ -202,18 +202,23 @@
   <div class="step-header">
     <div class="step-num">V2</div>
     <div class="step-info">
-      <div class="step-title">Assemble draft + override</div>
-      <div class="step-subtitle">select 1+ tasks → draft (nothing in Meta) → edit destination + copy</div>
+      <div class="step-title">Assemble draft + configure</div>
+      <div class="step-subtitle">select 1+ batches → draft (nothing in Meta) → pick copy, ad-set grouping/source, names</div>
       <div class="step-badges"><span class="badge badge-owner">Media buyer</span><span class="badge badge-system">Cockpit + API</span></div>
     </div>
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Buyer selects task(s) in the cockpit → Assemble</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">POST /api/launches → the bounty adapter builds a launches(draft) + one launch_item per creative, resolving copy (creator copy if submitted, else brand stock). Buyer reviews/overrides per ad (campaign, ad set new-from-template OR existing, headline/primary/CTA/link/UTM, plus up to 4 extra primary-text and headline variations per ad — Meta rotates and optimizes) — saved via PATCH; only edited ads are sent (preserves copy_source). The new-ad-set name pre-fills from the brand's naming template (brand_meta_config.adset_name_template, tokens {brand} {task} {date}) when set; always editable. Multi-task → one ad set.</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Buyer selects batch(es) in the cockpit → Assemble</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">POST /api/launches → builds launches(draft) + one launch_item per creative + a default ad-set group, and returns per-batch context (task_meta: creator name + per-task template name) + a base ad name per item. The buyer configures:
+    <br>• <strong>Copy (independent, mix-and-match)</strong> — pick a headline AND a primary text separately from the brand <em>copy library</em> (brand_copy_library, kind-keyed), or "create new"; up to 4 headline + 4 primary-text variations each (also library-or-new). Meta rotates/optimizes.
+    <br>• <strong>Ad-set grouping</strong> — when 2+ batches: toggle <em>one ad set for all</em> vs <em>one ad set per batch</em>. Per-batch panels are labeled by creator.
+    <br>• <strong>Per ad set (per group)</strong> — source mode <em>New (clone from a chosen source)</em> or <em>Existing (launch into a pre-existing ad set AS-IS — no clone/rename)</em>; name (brand template {brand} {task}, resolved per batch) + free-text append; live name preview.
+    <br>• <strong>Per ad</strong> — CTA / link / UTM + a free-text ad-name append (live preview of the resolved ad name).
+    <br>Saved via PATCH (adsets[] + items[]); only edited ads are sent (preserves copy_source).</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">Media buyer</div></div>
-    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">A reviewed draft launch; campaigns/ad sets come live from Meta (GET …/campaigns, /adsets)</div></div>
-    <div class="note note-resolved">Nothing is created in Meta until Push. Pre-push validation blocks empty copy / invalid URLs.</div>
+    <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">A reviewed draft with per-group ad-set config; campaigns/ad sets come live from Meta (GET …/campaigns, /adsets — paginated)</div></div>
+    <div class="note note-resolved">Nothing is created in Meta until Push. Pre-push validation blocks empty copy / invalid URLs. A custom ad-name template must keep {token} (Creative Matcher anchor) — enforced at config save.</div>
   </div>
 </div>
 
