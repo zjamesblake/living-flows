@@ -248,7 +248,7 @@
     <div class="branch-grid">
       <div class="branch branch-success"><strong>Success</strong><br>Enrollment created, submission link delivered</div>
       <div class="branch branch-warn"><strong>Already enrolled</strong><br>"Already enrolled" DM — no duplicate</div>
-      <div class="branch branch-fail"><strong>Not approved</strong><br>Rejected — student not in approved status</div>
+      <div class="branch branch-fail"><strong>Not approved</strong><br>Rejected gracefully — student gets a DM with their status + renew instructions (no silent failure, no n8n error execution)</div>
     </div>
     <div class="note note-resolved">Duplicate enrollment protection: same check-before-write pattern as SO. One enrollment per student per brand enforced at Supabase level.</div>
   </div>
