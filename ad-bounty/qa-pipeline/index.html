@@ -374,8 +374,8 @@
     <div class="expand-icon">▾</div>
   </div>
   <div class="step-details">
-    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">ClickUp status changes to <code>approved</code> (fires from both 4.1 approve and manual drags — guard handles both)</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">5.0v2: <strong>Fetch Supabase State</strong> → <strong>Expected State?</strong> (is <code>final_status='approved'</code>?) → if no, Comment: Bypass Detected and bail. If yes, proceed: Gemini grading → <strong>Patch Grade</strong> in Supabase → DM: Approved &amp; Graded (creator) → Comment: Grade Posted.</div></div>
+    <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Auto path: ClickUp status changes to <code>approved</code> (automation). Manual path (2026-07-24): direct webhook call from 4.1's chain tail — one-step Approve All never transits <code>approved</code>, so the automation can't fire for it.</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">5.0v2: <strong>Fetch Supabase State</strong> → <strong>Expected State?</strong> (is <code>final_status</code> <code>approved</code> OR <code>ready_to_launch</code>?) → if no, Comment: Bypass Detected and bail. If yes, proceed: Gemini grading → <strong>Patch Grade</strong> in Supabase → DM: Approved &amp; Graded (creator) → Comment: Grade Posted.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (5.0v2)</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">n8n → Supabase → Gemini → Supabase → Discord</div></div>
     <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Grade written to Supabase. Creator DM sent. (Media buyer launch DM lives on the Ready-to-Launch step.)</div></div>
