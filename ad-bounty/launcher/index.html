@@ -169,9 +169,11 @@
 
 <div class="quality-card">
   <h3>When a launch fails or gets stuck</h3>
-  <div class="quality-item"><strong>Read the ClickUp comment</strong> — every failure names the step and the fix (bad URL, missing copy, page permission, etc.). The comment trail + status tells the whole story.</div>
+  <div class="quality-item"><strong>Open Launch History and read the reason</strong> — a failed or partial batch shows the launch-level reason on the card, and each creative that failed shows its own error. (The ClickUp comment says the same thing per task.)</div>
+  <div class="quality-item"><strong>Hit Retry</strong> on the batch — in Launch History or the launches tray. It resumes: ads that already landed are adopted, not duplicated, so Retry is always safe to press, including on a batch that turned out to be finished already. <em>You no longer need to move the task back to "ready to launch".</em></div>
   <div class="quality-item"><strong>Transient</strong> errors (Meta rate limits, video processing) retry automatically — no action needed.</div>
-  <div class="quality-item"><strong>Permanent</strong> errors: fix the root cause, then move the task back to <em>ready to launch</em> to re-trigger. Resume is idempotent — no duplicate ads. (Or wait for the daily reconciler.)</div>
+  <div class="quality-item"><strong>"Campaign is at 200/200 ad sets"</strong> — Meta's hard cap for a campaign with a budget, and only <em>deleting</em> ad sets frees a slot. The push is refused before anything is created, so nothing is half-done. Delete unused ad sets in that campaign (or group more tasks into one ad set), then Retry. Every launch consumes one ad set per task, so this refills steadily.</div>
+  <div class="quality-item"><strong>Still stuck?</strong> Fix the root cause named in the error (bad URL, missing copy, page permission), then Retry. The daily reconciler is the last-resort safety net.</div>
 </div>
 
 </div>
