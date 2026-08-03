@@ -508,6 +508,7 @@
   <div class="quality-item"><strong>QA results + override_decision</strong> visible on ClickUp tasks and Ops Dashboard. Per-gate precision + FN% tracked in the monthly calibration digest.</div>
   <div class="quality-item"><strong>Guard reverts</strong> post a Comment: Guard Reverted on the task — operator sees the explanation immediately.</div>
   <div class="quality-item"><strong>Bail-on-bypass</strong> events post a Comment: Bypass Detected — auditable trail of skipped side-effects.</div>
+  <div class="quality-item"><strong>Failed runs</strong> surface in the morning <code>/ops-triage</code> errors lane, which names the node that failed. Note the limit: n8n only reports a run as failed if something actually <em>threw</em> — a workflow that quietly drops an item still reports success. The stuck-QA lane is the backstop for that class (tasks sitting past ~3h).</div>
 </div>
 
 <div class="quality-card">
