@@ -433,6 +433,7 @@
     <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Supabase mirrors ClickUp lifecycle state. Dashboard queries (status_group, etc.) reflect current reality.</div></div>
     <div class="detail-row"><div class="detail-label">Handoff</div><div class="detail-value">Brand-management reporting reads from Supabase. No further system action.</div></div>
     <div class="note note-info">Narrowed in May 2026 to only handle post-RTL states. Earlier states (manual_review, approved, ready_to_launch) are owned by their dedicated workflows (3.0v2, 4.1, 6.0 RTL).</div>
+    <div class="note note-info"><strong>Generation scoping (Aug 2026, decision #115).</strong> A task that resubmits after a launch keeps its launched rows forever, so its rows span two generations. 7.0 now <strong>no-ops</strong> when the task already holds a launched generation and the newest generation has not launched — a board move to a post-launch status cannot be describing creatives that never ran. Every lifecycle workflow reads the newest generation and writes only to it.</div>
   </div>
 </div>
 </div>
