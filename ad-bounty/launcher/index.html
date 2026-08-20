@@ -381,7 +381,7 @@
   </div>
   <div class="step-details">
     <div class="detail-row"><div class="detail-label">Trigger</div><div class="detail-value">Ad set ready; loop over the task's submissions rows (we know the exact drive_file_ids)</div></div>
-    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Video: SA download → chunked upload → poll ready → ffmpeg thumbnail → image hash. Image: direct upload. Then ad creative (page, copy, link + UTM, CTA) → ad (PAUSED) in the cloned ad set. Deterministic ad name; pre-create search adopts an existing ad instead of duplicating.</div></div>
+    <div class="detail-row"><div class="detail-label">Action</div><div class="detail-value">Video (2026-08-20): mint a signed 30-min media URL → Meta FETCHES the file itself (<code>advideos file_url</code>) → poll ready → Meta's auto-generated thumbnail → image hash. The creative never touches local disk. Image: direct upload (unchanged). Then ad creative (page, copy, link + UTM, CTA) → ad (PAUSED) in the cloned ad set. Deterministic ad name; pre-create search adopts an existing ad instead of duplicating.</div></div>
     <div class="detail-row"><div class="detail-label">Owner</div><div class="detail-value">System (Launcher worker)</div></div>
     <div class="detail-row"><div class="detail-label">System</div><div class="detail-value">Google Drive (service account) → Meta Marketing API</div></div>
     <div class="detail-row"><div class="detail-label">Output</div><div class="detail-value">Every Meta ID (video, image hash, creative, ad) persisted to submissions + launch_items after EACH step; launch_actions log per step</div></div>
